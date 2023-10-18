@@ -1,0 +1,22 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<h2>{{listing.title}}</h2>
+
+<div class="row">
+    <div class="col-2">
+        <label>Category</label>
+        <div>{{listing.category}}</div>
+    </div>
+    <div class="col-2">
+        <label>Current Bid</label>
+        <div>${{listing.bid}}</div>
+    </div>
+</div>
+<br/>
+<br/>
+<label>Description</label>
+<div>{{listing.description}}</div>
+<br/>
+<br/>
+{% endblock %}

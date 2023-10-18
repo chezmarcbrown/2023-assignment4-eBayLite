@@ -5,7 +5,9 @@
 
 <article>
     {% for listing in listings %}
-    <section>{{listing.title}}</section>
+    <section>
+        <a href="{% url 'listing' listing.id %}">{{listing.title}}</a>
+    </section>
     {% endfor %}
 </article>
 {% endblock %}
