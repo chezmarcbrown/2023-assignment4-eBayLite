@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<h2 class="center text-center">Categories</h2>
+
+{% for category in categories %}
+<div class="center card text-center">
+    <a class="text-vertical-center">{{category}}</a>
+</div>
+{% endfor %}
+{% endblock %}

@@ -5,7 +5,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, categories, Listing
+from .models import User, category_list, Listing
 
 
 def index(request):
@@ -80,11 +80,16 @@ def create(request):
         return redirect(index)
     else:
         return render(request, "auctions/create.html", {
-            "categories": categories
+            "categories": category_list
         })
     
 def listing(request, listing_id):
     listing = Listing.objects.get(id = listing_id)
     return render(request, "auctions/listing.html" , {
         "listing": listing
+    })
+
+def categories(request):
+    return render(request, "auctions/categories.html", {
+        "categories": category_list
     })
