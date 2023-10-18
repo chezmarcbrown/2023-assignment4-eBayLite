@@ -15,3 +15,15 @@ body {
 .form-control {
   width: 50%;
 }
+
+.row {
+  display: flex;
+}
+
+.col-2 {
+  width: 50%;
+}
+
+.col-3 {
+  width: 33%;
+}
