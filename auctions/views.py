@@ -9,10 +9,30 @@ from .models import User, category_list, Listing
 
 
 def index(request):
-    listings = Listing._meta.model.objects.all()
-    return render(request, "auctions/index.html", {
-        "listings": listings
-    })
+    category = ''
+    if 'category' not in request.GET:
+        category = None
+    else:
+        category = request.GET['category']
+
+    if category is not None:
+        listings = Listing._meta.model.objects.filter(category__icontains=category).values()
+
+        if listings:
+            return render(request, "auctions/index.html", {
+                "listings": listings,
+                "category": category
+            })
+        else:
+            return render(request, "auctions/index.html", {
+                "message": "There are no active listings for this category",
+                "category": category
+            })
+    else:
+        listings = Listing._meta.model.objects.all()
+        return render(request, "auctions/index.html", {
+            "listings": listings
+        })
 
 
 def login_view(request):
@@ -74,8 +94,11 @@ def create(request):
             category = request.POST['category'],
             description = request.POST['description'],
             bid = request.POST['starting_bid'],
-            is_active = True
+            is_active = True,
+            user = request.user
         )
+        print(request.user)
+        print(request.user)
         listing.save()
         return redirect(index)
     else:
@@ -85,8 +108,16 @@ def create(request):
     
 def listing(request, listing_id):
     listing = Listing.objects.get(id = listing_id)
+    if request.method == "POST":
+        user = User.objects.get(id = request.user.id)
+        print(request.POST.get('add_to_watchlist', False))
+        if request.POST.get('add_to_watchlist', False) and listing_id not in user.watchlist:
+            user.watchlist.append(listing_id)
+            print('test test')
+            print(user.watchlist)
     return render(request, "auctions/listing.html" , {
-        "listing": listing
+        "listing": listing,
+        "min_bid": listing.bid + 5
     })
 
 def categories(request):

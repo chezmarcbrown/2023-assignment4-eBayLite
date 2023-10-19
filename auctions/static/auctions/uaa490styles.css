@@ -20,6 +20,13 @@ body {
   display: flex;
 }
 
+.border-bottom {
+  align-self: center;
+  border-bottom: 2px solid #898EA4;
+  border-radius: 5px;
+  margin: 0px;
+}
+
 .center {
   margin-left: 25%;
   margin-right: 25%;
@@ -34,6 +41,10 @@ body {
   line-height: 200px;
 }
 
+.col {
+  width: 100%;
+}
+
 .col-2 {
   width: 50%;
 }
@@ -42,16 +53,129 @@ body {
   width: 33%;
 }
 
-.card {
-  width: 50%;
+.card-gray {
+  display: grid;
+  width: 100%;
+  height: 200px;
+  background-color: rgb(39, 39, 39);
+  border: 3px solid #898EA4;
+  border-radius: 10px;
+  align-content: space-evenly;
+
+  .row {
+    padding: 0px 25px;
+  }
+
+  label {
+    color: rgba(0, 195, 255, 0.753);
+  }
+}
+
+.card-blue {
+  display: grid;
+  width: 100%;
+  height: 200px;
+  color: rgba(0, 195, 255, 0.753);
+  background-color: rgb(39, 39, 39);
+  border: 3px solid rgba(0, 195, 255, 0.753);
+  border-radius: 10px;
+  align-content: space-evenly;
+
+  .row {
+    padding: 0px 25px;
+  }
+
+  label {
+    color: rgba(0, 195, 255, 0.753);
+  }
+}
+
+.interactive-card {
+  display: flex;
+  width: 100%;
   height: 200px;
   margin-bottom: 40px;
-  background-color: rgb(39, 39, 39);
-  border: 3px solid rgba(255, 174, 0, 0.753);
+  background-color: rgb(39, 39, 39) !important;
+  border: 3px solid rgba(0, 195, 255, 0.753);
+  color: rgba(0, 195, 255, 0.753) !important;
+  border-radius: 10px;
 
   &:hover {
-    background-color: transparent;
-    color: black;
+    background-color: rgb(131, 131, 131);
     cursor: pointer;
+  }
+}
+
+input {
+  border: 3px solid rgba(0, 195, 255, 0.753) !important;
+  
+  &.button {
+    background-color: rgba(0, 195, 255, 0.753) !important;
+    color: aliceblue !important;    
+  }
+  
+  &.category {
+    transition: all 500ms;
+    justify-content: center;
+
+    &:hover {
+      font-size: 40px;
+    }
+  }
+}
+
+button {
+  background-color: rgba(0, 195, 255, 0.753) !important;
+  border-color: rgba(0, 195, 255, 0.753) !important;
+
+  > a {
+    color: aliceblue !important;
+    text-decoration: none !important;
+  }
+}
+
+.float-right {
+  float: right;
+}
+
+.p-25 {
+  padding: 25px;
+}
+
+.mb-25 {
+  margin-bottom: 25px;
+}
+
+.space-evenly {
+  & > *:not(:last-of-type) {
+    margin-right: 50px;
+  }
+}
+
+.dollar-sign {
+  float: left;
+  font-size: 30px;
+}
+
+.place_bid {
+  width: 100%;
+
+  > span {
+    width: 10%;
+  }
+  > input {
+    border: 1px solid rgba(0, 195, 255, 0.753) !important;
+  }
+  > #place_bid_field {
+    float: left;
+    width: 40%;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  > #place_bid_button {
+    width: 50%;
+    float: left;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
   }
 }

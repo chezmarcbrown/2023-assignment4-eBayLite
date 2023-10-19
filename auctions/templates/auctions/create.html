@@ -20,7 +20,8 @@
         </div>
         <div class="col-3">
             <label>Starting Bid</label>
-            $ <input name="starting_bid" type="number" placeholder="0.00" />
+            <span class="dollar-sign">$</span>
+            <input name="starting_bid" type="number" placeholder="0.00" />
         </div>
     </div>
     <br/>
@@ -29,7 +30,7 @@
     <textarea name="description" placeholder="Describe your item"></textarea>
     <br/>
     <br/>
-    <input type="submit" value="Create Listing"/>
+    <input class="button" type="submit" value="Create Listing"/>
 </form>
 
 {% endblock %}

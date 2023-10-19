@@ -1,9 +1,15 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
+{% if category is not None %}
+<h2>Active Listings: {{category}}</h2>
+{% else %}
 <h2>Active Listings</h2>
-
+{% endif %}
 <article>
+    {% if message is not None %}
+    {{message}}
+    {% endif %}
     {% for listing in listings %}
     <section>
         <a href="{% url 'listing' listing.id %}">{{listing.title}}</a>
