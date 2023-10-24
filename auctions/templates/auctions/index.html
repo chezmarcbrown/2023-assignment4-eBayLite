@@ -1,6 +1,16 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
+
+<h1>All Flights</h1>
+<ul>
+{% for a in auctions %}
+    <li>
+        <a href="{% url 'auctions:listing' a.id %}">Flight {{a.id}}: </a>
+        {{ a.title }} to {{ a.description }}</li>
+{% endfor %}
+</ul>
+
 <h2>Active Listings</h2>
 
 <article>

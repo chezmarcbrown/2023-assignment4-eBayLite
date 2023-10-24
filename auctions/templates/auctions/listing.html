@@ -1,0 +1,21 @@
+
+{% extends "auctions/layout.html" %}
+ 
+{% block main_contents %}
+       <h1>Flight #{{ listing.id }}</h1>
+       <p>Starting from: {{ listing.title }}</p>
+       <p>Destination: {{ listing.description }}</p>
+
+       <h2>
+        The passengers on this flight:</h2>
+        <ul>
+            {% for b in bids %}
+                <li>{{ b }}</li>
+            {% empty %}
+                No passengers have booked this flight
+            {% endfor %}
+        </ul>
+{% comment %} 
+TODO:: url should be for active listings page     {% endcomment %}
+        {% comment %} <h3><a href="{% url 'auctions:active_listings' %}">Go back to full list of flights</a></h3> {% endcomment %}
+{% endblock %}
