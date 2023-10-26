@@ -1,6 +1,11 @@
 from django.urls import path
 from django.urls import reverse
 
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings 
+from django.conf.urls.static import static 
+
 from . import views
 
 app_name = "auctions"
@@ -16,3 +21,6 @@ urlpatterns = [
     path("<int:listing_id>", views.listing, name="listing"),
     
 ]
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

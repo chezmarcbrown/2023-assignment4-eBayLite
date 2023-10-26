@@ -11,6 +11,8 @@ python manage.py runserver
 
 *optional- create custom query objects* python manage.py shell
 
+WHEN DONE WITH VENV
+deactivate
 
 ```
 

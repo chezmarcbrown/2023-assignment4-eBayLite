@@ -2,22 +2,23 @@
 
 {% block main %}
 
-<h1>All Flights</h1>
-<ul>
-{% for a in auctions %}
-    <li>
-        <a href="{% url 'auctions:listing' a.id %}">Flight {{a.id}}: </a>
-        {{ a.title }} to {{ a.description }}</li>
-{% endfor %}
-</ul>
-
 <h2>Active Listings</h2>
+<ul>
 
 <article>
-    <section>Listing 1</section>
-
-    <section>Listing 2</section>
-
-    <section>Listing 3</section>
+    {% for a in auctions %}
+    <section>
+        <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{a.id}}: </a></h4>
+        <p>Title {{ a.title }}</p>
+        <p>Description {{ a.description }} </p>
+        <p>Starting Bid {{ a.starting_bid }}</p>
+        <p>Image {{ a.image_url }} </p>
+        <p>Category {{ a.category }} </p>
+    </section>
+    {% endfor %}
 </article>
+
+</ul>
+
+
 {% endblock %}

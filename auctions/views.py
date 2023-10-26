@@ -1,13 +1,28 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .models import User
+from .models import User, AuctionListing, Category, Bid, Comment
+from .forms import AuctionForm, BidForm, CommentForm
+from django.contrib import messages
+
+
 
 # active listings go here?
 def index(request):
-    return render(request, "auctions/index.html")
+    if request.method == "POST":
+        acution_form = AuctionForm(request.POST, request.FILES)
+        if acution_form.is_valid():
+            acution_form.save()
+            messages.success(request, (f'\"{ acution_form.cleaned_data["title"] }\" was successfully added!'))
+            return redirect("auctions:index")
+        else:
+            messages.error(request, 'Error saving form')
+    else: 
+        acution_form = AuctionForm()
+    auctions = AuctionListing.objects.all()
+    return render(request, "auctions/index.html", {'acution_form':acution_form, 'auctions':auctions})
 
 
 def login_view(request):
@@ -105,4 +120,5 @@ def watchlist(request):
 
 
 def categories(request):
-    return render(request, "auctions/categories.html")
+    categories = Category.objects.all()
+    return render(request, "auctions/categories.html", {'categories': categories})
