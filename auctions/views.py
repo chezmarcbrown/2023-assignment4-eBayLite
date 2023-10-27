@@ -6,6 +6,8 @@ from django.urls import reverse
 from .models import Auction, User, Bid, Comment
 from .forms import AuctionForm, CommentForm
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError
+
 
 
 def index(request):
@@ -145,7 +147,10 @@ def makebid(request, bid_id, auction_id):
             bid.save()
             auction.price = price
             auction.save()
+            #addwishlist(request, auction_id)
             return HttpResponseRedirect(reverse('auctions:index'))
+        else:
+            raise ValueError('Bid needs to be larger than current highest bid')  
         
 @login_required(login_url='auctions/login.html')
 def comment(request, auction_id):
@@ -157,3 +162,12 @@ def comment(request, auction_id):
             comment = Comment(user=request.user,auction=auction, **text)
             comment.save()
             return HttpResponseRedirect(reverse('auctions:index'))
+
+@login_required(login_url='auctions/login.html')
+def closebid(request, auction_id):
+    #close the auction
+    auction = get_object_or_404(Auction, id=auction_id)#get auction object
+    auction.winner = request.user.username# save highest bidder as the winner
+    auction.closed = True# close the auction
+    auction.save()# save to the database
+    return HttpResponseRedirect(reverse('auctions:index'))

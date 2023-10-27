@@ -2,10 +2,14 @@
 
 {% block main %}
 <h2>Active Listings</h2>
-{% for item in auctions %}
-    <div><a href="{% url 'auctions:auction' item.id %}">{{ item.title }}</div>
-    <div>Description: {{ item.description }}</div>
-    <div>Current Price: {{ item.price }}</div>
-    <div>{{ item.image_url }}</div>
+{% for page in auctions %}
+    {% if page.closed == False %}
+        <article>
+            <div><a href="{% url 'auctions:auction' page.id %}">{{ page.title }}</div>
+            <div>Description: {{ page.description }}</div>
+            <div>Current Price: {{ page.price }}$</div>
+            <div><img src="{{ page.image_url }}" width="200px"></div>
+        </article>
+    {% endif %}
 {% endfor %}
 {% endblock %}

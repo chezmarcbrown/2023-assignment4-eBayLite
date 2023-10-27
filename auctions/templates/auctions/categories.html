@@ -3,6 +3,8 @@
 {% block main %}
 <h2>Categories</h2>
 {% for cat in categories %}
-    <div><a href="{% url 'auctions:category' cat %}">{{ cat }}</div>
+    <article class="cat">
+        <div class="table caption"><a href="{% url 'auctions:category' cat %}">{{ cat }}</div>
+    </article>        
 {% endfor %}
 {% endblock %}
