@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
-
+<!--This could be deleted as index.html does the exact same thing-->
 {% block main %}
-<h2>Active Listings</h2>
+<h2>Active Listings in {{name}}</h2>
 {% for item in auctions %}
     <div><a href="{% url 'auctions:auction' item.id %}">{{ item.title }}</div>
     <div>Description: {{ item.description }}</div>
