@@ -12,7 +12,8 @@ from django.core.exceptions import ValidationError
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "auctions":Auction.objects.all()
+        "auctions":Auction.objects.all(),
+        "user": request.user
     })
 
 

@@ -11,12 +11,14 @@ class Auction(models.Model):
     TOYS = "Toys"
     ELECTRONICS = "Electronics"
     HOME = "Home"
+    GAMES = "Games"
 
     CATEGORIES = [
         (FASHION, "Fashion"),
         (TOYS, "Toys"),
         (ELECTRONICS, "Electronics"),
-        (HOME, "Home")
+        (HOME, "Home"),
+        (GAMES, "Games")
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -29,6 +31,8 @@ class Auction(models.Model):
     #created_at = models.DateTimeField(auto_now_add=True)
     closed = models.BooleanField(default=False)
     winner = models.CharField(max_length=70, blank=True, null=True)
+    #winner = models.ForeignKey(User, on_delete=models.CASCADE)
+    #winner = models.ForeignObject()
 
     def __str__(self):
         return f'{self.title}: made by {self.user.username}'
