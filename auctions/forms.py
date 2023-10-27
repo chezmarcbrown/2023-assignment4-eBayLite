@@ -54,7 +54,7 @@ class AuctionForm(forms.Form):
         label='Category',
         required=False,
         choices=Auction.CATEGORIES,
-        widget=forms.TextInput(attrs={
+        widget=forms.Select(attrs={
             'class': 'form-control form-group',
             'autocomplete': 'on',
             'placeholder': 'Category'
