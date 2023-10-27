@@ -27,7 +27,7 @@
         {% if bid.user == auction.user %}
         <div>Current Price: {{auction.price}}$</div>
         {% else %}
-        <div>Current Price: {{ auction.price }}$ from {{bid.user.username}}</div><!--displays wrong user-->
+        <div>Current Price: {{ auction.price }}$ from {{bid.user.username}}</div>
         {% endif %}
         {% if user.is_authenticated %}
             <form action="{% url 'auctions:makebid' bid.id auction.id %}" method="POST">

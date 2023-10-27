@@ -27,12 +27,8 @@ class Auction(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     category = models.CharField(max_length=20, choices=CATEGORIES, blank=False)
     image_url = models.URLField(default='')
-    #bid_counter = models.IntegerField(default=1)
-    #created_at = models.DateTimeField(auto_now_add=True)
     closed = models.BooleanField(default=False)
     winner = models.CharField(max_length=70, blank=True, null=True)
-    #winner = models.ForeignKey(User, on_delete=models.CASCADE)
-    #winner = models.ForeignObject()
 
     def __str__(self):
         return f'{self.title}: made by {self.user.username}'

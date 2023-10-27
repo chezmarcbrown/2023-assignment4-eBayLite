@@ -1,5 +1,5 @@
 from django import forms
-from .models import Auction, User, Bid
+from .models import Auction
 
 
 class AuctionForm(forms.Form):
@@ -35,21 +35,6 @@ class AuctionForm(forms.Form):
         }
         )
     )
-    """
-    starting_bid = forms.DecimalField(
-        label='Starting Bid',
-        required=True,
-        initial=0.01,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control form-group',
-            'placeholder': 'Starting bid',
-            'min': '0.01',
-            'max': '99999999999.99',
-            'step': '0.01'
-        }
-        )
-    )
-    """
     category = forms.ChoiceField(
         label='Category',
         required=False,
@@ -64,7 +49,7 @@ class AuctionForm(forms.Form):
     image_url = forms.URLField(
         label='Image URL',
         required=False,
-        initial='https://user-images.githubusercontent.com/52632898/161646398-6d49eca9-267f-4eab-a5a7-6ba6069d21df.png',
+        initial='',
         widget=forms.TextInput(attrs={
             'class': 'form-control form-group',
             'placeholder': 'Image URL (optional)',
