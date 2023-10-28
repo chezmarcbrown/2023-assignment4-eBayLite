@@ -2,9 +2,15 @@
 
 {% block body %}
     <h2>Categories</h2>
-    <form action="{% url 'filter' %}">
-        <input type="text" class="form-control" name="category"
-               placeholder="Enter a category like cards, vehicle, etc..." autofocus>
+    
+    {# Ensure the form's action attribute points to the correct URL for filtering #}
+    <form action="{% url 'filter' %}" method="get"> {# Ensure this is the correct name for your URL! #}
+        <select name="category" class="form-control">
+            <option value="">--Select a category--</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select>
         <br>
         <input type="submit" class="btn btn-primary" value="Filter">
     </form>

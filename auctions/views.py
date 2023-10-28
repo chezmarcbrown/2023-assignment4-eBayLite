@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
-from .models import User, AuctionListing, Bid, Comment
+from .models import User, AuctionListing, Bid, Comment, Category
 from .forms import AuctionListingForm, CommentForm
 
 
@@ -78,18 +78,24 @@ def create(request):
 
 @login_required(login_url='auctions/login.html')
 def insert(request):
-    form = AuctionListingForm(request.POST)
-    if form.is_valid():
-        auction = AuctionListing(user=request.user, **form.cleaned_data)
-        if not auction.image_url:
-            auction.image_url = 'https://user-images.githubusercontent.com/52632898/161646398-6d49eca9-267f-4eab-a5a7-6ba6069d21df.png'
-        auction.save()
-        starting_bid = auction.starting_bid
-        bid = Bid(amount=starting_bid, user=request.user, auction=auction)
-        bid.save()
-        print("auction:" + auction.image_url)
-        return HttpResponseRedirect(reverse('index'))
+    if request.method == 'POST':
+        form = AuctionListingForm(request.POST, request.FILES)
+        if form.is_valid():
+            auction = form.save(commit=False)
+            auction.user = request.user
+            auction.save()
+
+            starting_bid = auction.starting_bid
+            bid = Bid(amount=starting_bid, user=request.user, auction=auction)
+            bid.save()
+            return HttpResponseRedirect(reverse('index'))
+        else:
+            return render(request, 'auctions/create.html', {
+                'form': form,
+                'error': form.errors
+            })
     else:
+        form = AuctionListingForm()
         return render(request, 'auctions/create.html', {
             'form': form,
             'error': form.errors
@@ -165,15 +171,32 @@ def unwatch(request, id):
 
 
 def categories(request):
-    return render(request, "auctions/categories.html")
-
+    categories = Category.objects.all()
+    return render(request, 'auctions/categories.html', {'categories': categories})
 
 def filter(request):
-    q = request.GET['category'].lower()
-    return render(request, 'auctions/category.html', {
-        'listings': AuctionListing.objects.filter(category=q)
-    })
+    # Get the 'category' from the query parameters (it seems to be an ID in the URL).
+    category_id = request.GET.get('category')
+    listings = []
+    categories = Category.objects.all()
+    selected_category = None
 
+    # If a category was selected, filter the listings by that category.
+    if category_id:
+        # Try to find the category by ID since the error indicates 'category=1' which looks like an ID.
+        selected_category = get_object_or_404(Category, pk=category_id)
+        listings = AuctionListing.objects.filter(category=selected_category)
+    else:
+        # If no specific category is selected, we might want to show all listings or handle it differently.
+        listings = AuctionListing.objects.all()
+
+    context = {
+        'categories': categories,
+        'selected_category': selected_category,  # This will be None if no category is selected.
+        'listings': listings,
+    }
+    
+    return render(request, 'auctions/category.html', context)
 
 def add_comment(request, id):
     anonymous = User.first_name
@@ -194,3 +217,4 @@ def add_comment(request, id):
         return render(request, 'auctions/login.html', {
             'message': 'Must be logged in to be able to comment!'
         })
+    

@@ -1,12 +1,20 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>{{ category }}</h2>
-    <form action="{% url 'filter' %}">
-        <input type="text" class="form-control mb-4" name="category"
-               placeholder="Enter a category like cards, vehicle, etc..." autofocus>
+    <h2>{{ selected_category.name|default:"All Categories" }}</h2>
+
+    <!-- Filter form with categories dropdown -->
+    <form action="{% url 'filter' %}" method="get">
+        <select name="category" class="form-control mb-4" onchange="this.form.submit()">
+            <option value="">All Categories</option>
+            {% for cat in categories %}
+                <!-- Note that we're now using cat.id instead of cat.name -->
+                <option value="{{ cat.id }}" {% if selected_category and selected_category.id == cat.id %}selected{% endif %}>{{ cat.name }}</option>
+            {% endfor %}
+        </select>
     </form>
     <hr>
+
     {% if listings %}
         {% for item in listings %}
             <div class="container pb-5 mt-n2 mt-md-n3">

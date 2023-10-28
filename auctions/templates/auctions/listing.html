@@ -30,6 +30,7 @@
                         <p class="pt-1 pb-2 border-bottom"><b>Last Updated: </b> {{ bid.created_at }}</p>
                         {% if auction.category %}
                             <p class="pt-1 pb-2 border-bottom"><b>Category: </b> {{ auction.category | title }}</p>
+                            </p>
                         {% else %}
                             <p class="pt-1 pb-2 border-bottom"><b>Category: </b> Not Listed.</p>
                         {% endif %}
