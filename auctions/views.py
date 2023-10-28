@@ -99,13 +99,17 @@ def auction(request, auction_id):# show the auction you click on
     })
 
 def categories(request):#show a list of all categories and be able to select on and go to category
-    categories = Auction.CATEGORIES
-    categories_fixed = []
-    for x in categories:
-        categories_fixed.append(x[1])
+    category_names = [category[1] for category in Auction.CATEGORIES]
     return render(request, "auctions/categories.html", {
-        'categories': categories_fixed
+        'categories': category_names
     })
+    # categories = Auction.CATEGORIES
+    # categories_fixed = []
+    # for x in categories:
+    #     categories_fixed.append(x[1])
+    # return render(request, "auctions/categories.html", {
+    #     'categories': categories_fixed
+    # })
 
 def category(request, cat_name):# show a list of all auctions within the category you selected
     auctions = Auction.objects.filter(category=cat_name)
