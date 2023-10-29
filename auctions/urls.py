@@ -22,4 +22,4 @@ urlpatterns = [
     path("close-bid/<int:id>", views.close_bid, name="close_bid"),
 
     path("comments/<int:id>", views.add_comment, name="add_comment"),
-]
+] 

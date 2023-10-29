@@ -106,7 +106,7 @@ def listing(request, id):
     current = AuctionListing.objects.get(pk=id)
     bid = get_object_or_404(Bid, auction=current)
     comments = Comment.objects.filter(auction=current)
-    print("here:" + AuctionListing.objects.get(pk=id).image_url)
+    print("here:", current.image_url.url)
     return render(request, 'auctions/listing.html', {
         'auction': current,
         'user': request.user,
