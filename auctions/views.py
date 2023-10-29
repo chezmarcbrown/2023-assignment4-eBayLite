@@ -5,21 +5,33 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, category_list, Listing
+from .models import User, category_list, Listing, Watchlist
 
 
 def index(request):
     category = ''
     watchlist = []
     listings = Listing._meta.model.objects
-
+    
     if 'category' not in request.GET:
         category = None
     else:
         category = request.GET['category']
-
+        
     if request.GET.get('watchlist'):
-        pass
+        user = User.objects.get(id = request.user.id)
+        watchlist_items =  Watchlist.objects.get(user=request.user).item.all().values_list('pk')
+        listings = listings.filter(id__in=watchlist_items).values()
+        if listings:
+            return render(request, "auctions/index.html", {
+                "listings": listings,
+                "header": f"Watchlist"
+            })
+        else:
+            return render(request, "auctions/index.html", {
+                "message": "Your watchlist is empty.",
+                "header": f"Watchlist"
+            })
 
 
     if category is not None:
@@ -28,19 +40,19 @@ def index(request):
         if listings:
             return render(request, "auctions/index.html", {
                 "listings": listings,
-                "category": category
+                "header": f"Active Listings: {category}"
             })
         else:
             return render(request, "auctions/index.html", {
-                "message": "There are no active listings for this category",
-                "category": category
+                "message": "There are no active listings for this category.",
+                "header": f"Active Listings: {category}"
             })
     else:
         listings = Listing._meta.model.objects.all()
         return render(request, "auctions/index.html", {
-            "listings": listings
+            "listings": listings,
+            "header": "Active Listings"
         })
-
 
 def login_view(request):
     if request.method == "POST":
@@ -83,6 +95,7 @@ def register(request):
         # Attempt to create new user
         try:
             user = User.objects.create_user(username, email, password)
+            Watchlist.objects.create(user=user).save()
             user.save()
         except IntegrityError:
             return render(request, "auctions/register.html", {
@@ -102,7 +115,7 @@ def create(request):
             description = request.POST['description'],
             bid = request.POST['starting_bid'],
             is_active = True,
-            user = request.user
+            author = request.user
         )
         listing.save()
         return redirect(index)
@@ -112,17 +125,35 @@ def create(request):
         })
     
 def listing(request, listing_id):
-    listing = Listing.objects.get(id = listing_id)
-    if request.method == "POST":
-        user = User.objects.get(id = request.user.id)
-        if request.POST.get('add_to_watchlist') and listing_id not in user.watchlist:
-            user.watchlist.append(listing_id)
+    listings = Listing.objects.get(id = listing_id)
+    user = User.objects.get(id = request.user.id)
+    watchlist = Watchlist.objects.get(user=request.user)
+    
     return render(request, "auctions/listing.html" , {
-        "listing": listing,
-        "min_bid": listing.bid + 5
+        "listing": listings,
+        "min_bid": listings.bid + 5,
+        "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists()
     })
 
 def categories(request):
     return render(request, "auctions/categories.html", {
         "categories": category_list
     })
+
+def watchlist_add_or_remove(request, listing_id):
+    item_to_save = Listing.objects.get(id=listing_id)
+
+    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+    watchlist.save()
+
+    # Add item if it doesn't exist in watchlist
+    if not watchlist.item.all().filter(pk=listing_id).exists():
+        watchlist.item.add(item_to_save)
+        watchlist.save()
+    # Else remove the item if it does exist
+    else:
+        watchlist.item.remove(item_to_save)
+        watchlist.save()
+        
+
+    return redirect(listing, listing_id)

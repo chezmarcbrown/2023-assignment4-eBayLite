@@ -3,13 +3,16 @@
 {% block main %}
 <h2>{{listing.title}}</h2>
 
-{% if user.is_authenticated %}
-<form method="POST">{% csrf_token %}
-    <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
-    <input class="button" type="submit" value="Add to Watchlist"/>
+{% if user.is_authenticated and listing.author != user %}
+<form action="{% url 'watchlist_add_or_remove' listing.id %}" method="GET">
+    {% if listing.id and not is_on_watchlist %}
+        <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
+        <input class="button" type="submit" value="Add to Watchlist"/>
+    {% else %}
+        <input name="remove_from_watchlist" class="button" type="hidden" value="True"/>
+        <input class="button" type="submit" value="Remove from Watchlist"/>
+    {% endif %}
 </form>
-{% else %}
-<a href="{% url 'login' %}">Add to Watchlist</a>
 {% endif %}
 
 <div class="row space-evenly">
@@ -32,11 +35,11 @@
             </div>
             <div class="col-2">
                 <label>Posted By</label>
-                <div>{{listing.user}}</div>
+                <div>{{listing.author}}</div>
             </div>
         </div>
     </div>
-    {% if user.is_authenticated %}
+    {% if user.is_authenticated and listing.author != user %}
     <div class="col-3">
         <div class="card-blue p-25 text-center">
             <form method="POST">{% csrf_token %}

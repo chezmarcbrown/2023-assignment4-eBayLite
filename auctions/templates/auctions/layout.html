@@ -16,10 +16,14 @@
                 <span>
                     <a class="nav-button" href="{% url 'index' %}">Active Listings</a>
                     <a class="nav-button" href="{% url 'categories' %}">Categories</a>
+                    {% if user.is_authenticated %}
                     <form class="inline-flex" action="{% url 'index' %}" method="GET">
                         <input name="watchlist" type="hidden" value="True"/>
                         <input class="nav-button" type="submit" value="Watchlist"/>
                     </form>
+                    {% else %}
+                    <a class="nav-button" href="{% url 'login' %}">Watchlist</a>
+                    {% endif %}
                     {% if user.is_authenticated %}
                     <a class="nav-button" href="{% url 'create' %}">Create Listing</a>
                     {% else %}
@@ -29,10 +33,10 @@
                 <span>
                     {% if user.is_authenticated %}
                         Welcome <strong>{{ user.username }}!</strong>
-                        <a href="{% url 'logout' %}">Log Out</a>
+                        <a class="nav-button" href="{% url 'logout' %}">Log Out</a>
                     {% else %}
-                        <a href="{% url 'login' %}">Log In</a>
-                        <a href="{% url 'register' %}">Register</a>
+                        <a class="nav-button" href="{% url 'login' %}">Log In</a>
+                        <a class="nav-button" href="{% url 'register' %}">Register</a>
                     {% endif %}
                 </span>
             </nav>

@@ -1,11 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
-{% if category is not None %}
-<h2>Active Listings: {{category}}</h2>
-{% else %}
-<h2>Active Listings</h2>
-{% endif %}
+<h2>{{header}}</h2>
 <article>
     {% if message is not None %}
     {{message}}
