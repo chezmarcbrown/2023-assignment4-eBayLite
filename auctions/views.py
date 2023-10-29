@@ -10,13 +10,20 @@ from .models import User, category_list, Listing
 
 def index(request):
     category = ''
+    watchlist = []
+    listings = Listing._meta.model.objects
+
     if 'category' not in request.GET:
         category = None
     else:
         category = request.GET['category']
 
+    if request.GET.get('watchlist'):
+        pass
+
+
     if category is not None:
-        listings = Listing._meta.model.objects.filter(category__icontains=category).values()
+        listings = listings.filter(category__icontains=category).values()
 
         if listings:
             return render(request, "auctions/index.html", {
@@ -97,8 +104,6 @@ def create(request):
             is_active = True,
             user = request.user
         )
-        print(request.user)
-        print(request.user)
         listing.save()
         return redirect(index)
     else:
@@ -110,11 +115,8 @@ def listing(request, listing_id):
     listing = Listing.objects.get(id = listing_id)
     if request.method == "POST":
         user = User.objects.get(id = request.user.id)
-        print(request.POST.get('add_to_watchlist', False))
-        if request.POST.get('add_to_watchlist', False) and listing_id not in user.watchlist:
+        if request.POST.get('add_to_watchlist') and listing_id not in user.watchlist:
             user.watchlist.append(listing_id)
-            print('test test')
-            print(user.watchlist)
     return render(request, "auctions/listing.html" , {
         "listing": listing,
         "min_bid": listing.bid + 5

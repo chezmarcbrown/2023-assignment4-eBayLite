@@ -124,6 +124,22 @@ input {
   }
 }
 
+.nav-button {
+  margin: 0 0.5rem 1rem 0.5rem;
+  border: 1px solid #898EA4 !important;
+  border-radius: 5px;
+  color: #dcdcdc !important;
+  background-color: transparent !important;
+  display: inline-block;
+  padding: 0.1rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+  color: rgba(0, 195, 255, 0.753) !important;
+  border-color: rgba(0, 195, 255, 0.753) !important;
+  }
+}
+
 button {
   background-color: rgba(0, 195, 255, 0.753) !important;
   border-color: rgba(0, 195, 255, 0.753) !important;
@@ -132,6 +148,10 @@ button {
     color: aliceblue !important;
     text-decoration: none !important;
   }
+}
+
+.inline-flex {
+  display: inline-flex !important;
 }
 
 .float-right {

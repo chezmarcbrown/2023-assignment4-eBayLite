@@ -5,6 +5,7 @@
 
 {% if user.is_authenticated %}
 <form method="POST">{% csrf_token %}
+    <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
     <input class="button" type="submit" value="Add to Watchlist"/>
 </form>
 {% else %}
