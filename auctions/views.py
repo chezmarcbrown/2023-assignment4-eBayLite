@@ -4,8 +4,9 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Max
 
-from .models import User, category_list, Listing, Watchlist, Comment
+from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
 
 def index(request):
@@ -112,7 +113,8 @@ def create(request):
             title = request.POST['title'],
             category = request.POST['category'],
             description = request.POST['description'],
-            bid = request.POST['starting_bid'],
+            current_bid = request.POST['starting_bid'],
+            original_bid = request.POST['starting_bid'],
             is_active = True,
             author = request.user
         )
@@ -128,6 +130,13 @@ def listing(request, listing_id):
     user = User.objects.get(id = request.user.id)
     watchlist, created = Watchlist.objects.get_or_create(user=request.user)
     comments = Comment.objects.filter(item = item)
+    bids = Bid.objects.filter(item = item)
+    winning_bid = Bid.objects.filter(item=item).all().aggregate(Max('bid', default=item.original_bid))['bid__max']
+    winner = ""
+
+    if bids.filter(bid=winning_bid):
+        winner = bids.filter(bid=winning_bid).first().author
+
 
     if created:
         watchlist.save()
@@ -138,15 +147,19 @@ def listing(request, listing_id):
             comment.save()
             return redirect(listing, listing_id)
         if request.POST.get('place_bid'):
-            item.bid = request.POST.get('place_bid')
+            item.current_bid = request.POST.get('place_bid')
+            bid = Bid.objects.create(author=request.user, item=item, bid=request.POST.get('place_bid'))
             item.save()
+            bid.save()
             return redirect(listing, listing_id)
     
     return render(request, "auctions/listing.html" , {
         "listing": item,
-        "min_bid": item.bid + 5,
+        "min_bid": item.current_bid + 5,
         "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists(),
-        "comments": comments
+        "comments": comments,
+        "bids": bids,
+        "winner": winner
     })
 
 def categories(request):
@@ -177,4 +190,26 @@ def remove_listing(request, listing_id):
 def remove_comment(request, comment_id):
     listing_id = Comment.objects.get(id=comment_id).item.id
     Comment.objects.get(id=comment_id).delete()
+    return redirect(listing, listing_id)
+
+def remove_bid(request, bid_id):
+    listing_id = Bid.objects.get(id=bid_id).item.id
+    item = Listing.objects.get(id=listing_id)
+
+    Bid.objects.get(id=bid_id).delete()
+
+    # Get next highest bid
+    if Bid.objects.filter(item=item).all():
+        item.current_bid = Bid.objects.filter(item=item).all().aggregate(Max('bid', default=item.original_bid))['bid__max']
+        item.save()
+    else:
+        item.current_bid = item.original_bid
+        item.save()
+
+    return redirect(listing, listing_id)
+
+def close_listing(request, listing_id):
+    item = Listing.objects.get(id=listing_id)
+    item.is_active = False
+    item.save()
     return redirect(listing, listing_id)

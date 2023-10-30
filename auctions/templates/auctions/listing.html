@@ -3,8 +3,8 @@
 {% block main %}
 <h2>{{listing.title}}</h2>
 
-{% if user.is_authenticated and listing.author != user or user.is_superuser %}
 <div class="row">
+{% if user.is_authenticated and listing.author != user or user.is_superuser %}
     <form class="col-2" action="{% url 'watchlist_add_or_remove' listing.id %}" method="GET">
         <div>
             {% if listing.id and not is_on_watchlist %}
@@ -16,15 +16,27 @@
             {% endif %}
         </div>
     </form>
-    <form class="col-2" action="{% url 'remove_listing' listing.id %}" method="GET">
-        <div>
-            {% if user.is_superuser %}
-            <input name="remove_listing" class="button-delete" type="submit" value="Remove Listing"/>
-            {% endif %}
-        </div>
-    </form>
-</div>
+    
 {% endif %}
+    {% if listing.author == user or user.is_superuser %}
+    <div class="close_listing">
+        {% if user.is_superuser %}
+        <form action="{% url 'remove_listing' listing.id %}" method="GET">
+            <div>
+                <input name="remove_listing" class="button-delete" type="submit" value="Remove Listing"/>
+            </div>
+        </form>
+        {% endif %}
+        {% if listing.author == user and listing.is_active == True %}
+        <form class="float-right" action="{% url 'close_listing' listing.id %}" method="GET">
+            <div>
+                <input name="close_listing" class="button-close" type="submit" value="Close Listing"/>
+            </div>
+        </form>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
 
 <div class="row horizontal-space-evenly mt-50">
     <div class="card-gray">
@@ -35,7 +47,7 @@
             </div>
             <div class="col-2">
                 <label>Current Bid</label>
-                <div>${{listing.bid}}</div>
+                <div>${{listing.current_bid}}</div>
             </div>
         </div>
         <div class="border-bottom"></div>
@@ -50,9 +62,10 @@
             </div>
         </div>
     </div>
-    {% if user.is_authenticated and listing.author != user or user.is_superuser %}
+    {% if user.is_authenticated %}
     <div class="col-3">
         <div class="card-blue p-25 text-center">
+            {% if listing.is_active and listing.author != user %}
             <form method="POST">{% csrf_token %}
                 <label><b>Place Bid</b></label>
                 <br/>
@@ -62,21 +75,27 @@
                     <input class="button" id="place_bid_button" type="submit" value="Place Bid"/>
                 </div>
             </form>
+            {% elif listing.is_active == False %}
+            <label><b>Place Bid</b></label>
+            {{winner}} has won this item!
+            {% else %}
+            <label><b>Current highest bidder</b></label>
+            {{winner}}
+            {% endif %}
         </div>
     </div>
     {% endif %}
 </div>
-{% if listing.author != user or user.is_superuser %}
 <div class="row horizontal-space-evenly">
     <div class="col-2">
         <h4>Comments</h4>
-        <div class="card-gray vertical-space-evenly">
+        <div class="card-gray">
             {% for comment in comments %}
             <div class="row center">
                 <div class="col-2 card-gray p-25">
                     {{comment.author}} commented: {{comment.comment}}
                 </div>
-                <form action="{% url 'remove_comment' comment.id %}" method="GET">
+                <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
                     <div>
                         {% if user.is_superuser %}
                         <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
@@ -85,7 +104,7 @@
                 </form>
             </div>
             {% endfor %}
-            <form id="listing_comments" accept="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
+            <form id="listing_comments" action="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
                 <div class="comment_input">
                     <textarea name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
                     <input class="button" type="submit"/>
@@ -95,29 +114,22 @@
     </div>
     <div class="col-2">
         <h4>Bids</h4>
-        <div class="card-gray vertical-space-evenly">
-            {% for comment in comments %}
+        <div class="card-gray">
+            {% for bid in bids %}
             <div class="row center">
                 <div class="col-2 card-gray p-25">
-                    {{comment.author}} commented: {{comment.comment}}
+                    {{bid.author}} placed a bid for ${{bid.bid}}
                 </div>
-                <form action="{% url 'remove_comment' comment.id %}" method="GET">
+                <form class="vertical-center" action="{% url 'remove_bid' bid.id %}" method="GET">
                     <div>
                         {% if user.is_superuser %}
-                        <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
+                        <input name="remove_bid" class="button-delete" type="submit" value="Remove Bid"/>
                         {% endif %}
                     </div>
                 </form>
             </div>
             {% endfor %}
-            <form id="listing_comments" accept="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
-                <div class="comment_input">
-                    <textarea name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                    <input class="button" type="submit"/>
-                </div>
-            </form>
         </div>
     </div>
 </div>
-{% endif %}
 {% endblock %}
