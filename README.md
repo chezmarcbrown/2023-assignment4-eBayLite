@@ -1,6 +1,9 @@
 # 2023-assignment4-eBayLite
 
 python -m venv venv 
+
+
+
 .\venv\Scripts\activate
 pip install -r requirements.txt
 

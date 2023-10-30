@@ -10,7 +10,4 @@ def run():
             print(f'Processing row: {row}')
             category = row['category']
             active = row['active']
-            # if not Airport.objects.exists(code=code, city=city):
-            #     a=Airport(code=code, city=city)
-            #     a.save()
             AuctionListing.objects.get_or_create(category=category, active=active, defaults={'starting_bid': 0})

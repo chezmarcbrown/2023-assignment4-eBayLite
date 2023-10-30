@@ -1,24 +1,31 @@
-{% extends "auctions/layout.html" %}
-
-{% block main %}
+{% extends "auctions/layout.html" %} {% block main %}
 
 <h2>Active Listings</h2>
-<ul>
-
+{% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+{% endif %}
 <article>
-    {% for a in auctions %}
+  {% for a in auctions %}
+    {% if a.active == True %}
     <section>
         <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{a.id}}: </a></h4>
-        <p>Title {{ a.title }}</p>
-        <p>Description {{ a.description }} </p>
-        <p>Starting Bid {{ a.starting_bid }}</p>
-        <p>Image {{ a.image_url }} </p>
-        <p>Category {{ a.category }} </p>
-    </section>
-    {% endfor %}
+        <p>Title: {{ a.title }}</p>
+        <p>Description: {{ a.description }}</p>
+        <p>Starting Bid ${{ a.starting_bid }}</p>
+        <p>Image: {{ a.image_url }}</p>
+        <p>Category: {{ a.category }}</p>
+        <form action="{% url 'auctions:watchlist' a.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to Watchlist</button>
+        </form>
+      </section>
+    {% endif %}
+
+  {% endfor %}
 </article>
-
-</ul>
-
 
 {% endblock %}

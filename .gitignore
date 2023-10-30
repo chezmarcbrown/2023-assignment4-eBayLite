@@ -31,3 +31,6 @@ $RECYCLE.BIN/
 .vscode/
 .history/
 *.code-workspace
+
+
+*node_modules/

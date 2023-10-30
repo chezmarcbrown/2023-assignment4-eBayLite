@@ -1,8 +1,20 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
-
-<h2>Watch it</h2>
-
+<h1>Watchlist</h1>
+{% for i in watchlist_items %}
+    <h3>{{ i.title }}</h3>
+    <p>{{ i.category }}</p>
+    <p>{{ i.image }}</p>
+    {% if i.active == True %}
+        <p>Active</p>
+    {% else %}
+        <p>Not Active</p>
+    {% endif %}
+    <form action="{% url 'auctions:remove_from_watchlist' i.id %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Remove</button>
+    </form>
+{% endfor %}
 
 {% endblock %}

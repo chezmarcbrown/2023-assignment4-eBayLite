@@ -1,10 +1,8 @@
-{% extends "auctions/layout.html" %}
-
-{% block main %}
+{% extends "auctions/layout.html" %} {% block main %}
 <h1>Categories</h1>
 <ul>
-{% for c in categories %}
-    <li>{{ c.name }}</li>
-{% endfor %}
+  {% for c in categories %}
+  <li>{{ c.name }}</li>
+  {% endfor %}
 </ul>
 {% endblock %}

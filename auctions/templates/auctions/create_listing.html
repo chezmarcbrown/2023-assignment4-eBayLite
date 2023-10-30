@@ -1,7 +1,15 @@
-{% extends "auctions/layout.html" %}
-
-{% block main %}
-
-<h2>NEW NEW</h2>
+{% extends "auctions/layout.html" %} {% block main %}
+<header>
+  {% for m in messages %}
+  <h2 class="{{m.tags}}">{{m}}</h2>
+  {% endfor %}
+  <h2>Add a new Auction</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %} {{auction_form}}
+    <div>
+      <button type="submit">Submit</button>
+    </div>
+  </form>
+</header>
 
 {% endblock %}

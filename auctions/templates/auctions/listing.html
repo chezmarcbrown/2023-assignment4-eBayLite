@@ -1,21 +1,47 @@
-
 {% extends "auctions/layout.html" %}
- 
-{% block main_contents %}
-       <h1>Flight #{{ listing.id }}</h1>
-       <p>Starting from: {{ listing.title }}</p>
-       <p>Destination: {{ listing.description }}</p>
 
-       <h2>
-        The passengers on this flight:</h2>
-        <ul>
-            {% for b in bids %}
-                <li>{{ b }}</li>
-            {% empty %}
-                No passengers have booked this flight
-            {% endfor %}
-        </ul>
-{% comment %} 
-TODO:: url should be for active listings page     {% endcomment %}
-        {% comment %} <h3><a href="{% url 'auctions:active_listings' %}">Go back to full list of flights</a></h3> {% endcomment %}
+{% block main %}
+{% if messages %}
+  <ul class="messages">
+      {% for message in messages %}
+          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+  </ul>
+{% endif %}
+<h1>Listing</h1>
+<h3>{{ listing.title }}</h3>
+<p>{{ listing.description }}</p>
+<p>{{ listing.starting_bid }}</p>
+<p>{{ listing.category }}</p>
+<p>{{ listing.image }}</p>
+{% if listing.active == True %}
+    <p>Active</p>
+{% else %}
+    <p>Not Active</p>
+{% endif %}
+<form action="{% url 'auctions:watchlist' listing.id %}" method="post">
+    {% csrf_token %}
+    <button type="submit">Add to Watchlist</button>
+</form>
+<form action="{% url 'auctions:bid' listing.id %}" method="post">
+    {% csrf_token %}
+    {{ bid_form }}
+    <button type="submit">Bid</button>
+</form>
+<h1>Bids</h1>
+{% for bid in bids %}
+    <p>{{ bid.amount }}</p>
+{% endfor %}
+
+Leave a Comment
+<form action="{% url 'auctions:comment' listing.id %}" method="post">
+    {% csrf_token %}
+    {{ comment_form }}
+    <button type="submit">Comment</button>
+</form>
+<h1>Comments</h1>
+{% for comment in comments %}
+    <p>{{ comment.content }}</p>
+{% endfor %}
+
 {% endblock %}
