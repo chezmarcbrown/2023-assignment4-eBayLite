@@ -56,7 +56,6 @@ body {
 .card-gray {
   display: grid;
   width: 100%;
-  height: 200px;
   background-color: rgb(39, 39, 39);
   border: 3px solid #898EA4;
   border-radius: 10px;
@@ -166,9 +165,16 @@ button {
   margin-bottom: 25px;
 }
 
-.space-evenly {
+.horizontal-space-evenly {
   & > *:not(:last-of-type) {
     margin-right: 50px;
+  }
+}
+
+.vertical-space-evenly {
+  & > *:not(:last-of-type) {
+    margin-top: 25px;
+    margin-bottom: 25px;
   }
 }
 
@@ -198,4 +204,38 @@ button {
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
   }
+}
+
+.mt-50 {
+  margin-top: 50px;
+}
+
+h4 {
+  margin-bottom: 0px;
+}
+
+#listing_comments {
+  display: block;
+
+  >.comment_input {
+    width: 90% !important;
+    margin: auto;
+    
+    >input {
+      display: block !important;
+    }
+    
+    >textarea {
+      margin-top: 50px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      height: 150px;
+      resize: none;
+    }
+  }
+}
+
+.flex {
+  display: flex !important;
 }

@@ -125,13 +125,17 @@ def create(request):
         })
     
 def listing(request, listing_id):
-    listings = Listing.objects.get(id = listing_id)
+    item = Listing.objects.get(id = listing_id)
     user = User.objects.get(id = request.user.id)
     watchlist = Watchlist.objects.get(user=request.user)
+
+    if request.method == "POST":
+        if request.POST.get('comment_input'):
+            item.comments.append(request.POST.get('comment_input'))
     
     return render(request, "auctions/listing.html" , {
-        "listing": listings,
-        "min_bid": listings.bid + 5,
+        "listing": item,
+        "min_bid": item.bid + 5,
         "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists()
     })
 

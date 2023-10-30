@@ -15,7 +15,7 @@
 </form>
 {% endif %}
 
-<div class="row space-evenly">
+<div class="row horizontal-space-evenly mt-50">
     <div class="card-gray">
         <div class="row">
             <div class="col-2">
@@ -55,4 +55,20 @@
     </div>
     {% endif %}
 </div>
+{% if listing.author != user %}
+<h4>Comments</h4>
+<div class="card-gray vertical-space-evenly">
+    {% for comment in listing.comments %}
+    <div>
+        {{comment}}
+    </div>
+    {% endfor %}
+    <form id="listing_comments" accept="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
+        <div class="comment_input">
+            <textarea name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+            <input class="button" type="submit"/>
+        </div>
+    </form>
+</div>
+{% endif %}
 {% endblock %}
