@@ -3,16 +3,27 @@
 {% block main %}
 <h2>{{listing.title}}</h2>
 
-{% if user.is_authenticated and listing.author != user %}
-<form action="{% url 'watchlist_add_or_remove' listing.id %}" method="GET">
-    {% if listing.id and not is_on_watchlist %}
-        <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
-        <input class="button" type="submit" value="Add to Watchlist"/>
-    {% else %}
-        <input name="remove_from_watchlist" class="button" type="hidden" value="True"/>
-        <input class="button" type="submit" value="Remove from Watchlist"/>
-    {% endif %}
-</form>
+{% if user.is_authenticated and listing.author != user or user.is_superuser %}
+<div class="row">
+    <form class="col-2" action="{% url 'watchlist_add_or_remove' listing.id %}" method="GET">
+        <div>
+            {% if listing.id and not is_on_watchlist %}
+            <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
+            <input class="button" type="submit" value="Add to Watchlist"/>
+            {% else %}
+            <input name="remove_from_watchlist" class="button" type="hidden" value="True"/>
+            <input class="button" type="submit" value="Remove from Watchlist"/>
+            {% endif %}
+        </div>
+    </form>
+    <form class="col-2" action="{% url 'remove_listing' listing.id %}" method="GET">
+        <div>
+            {% if user.is_superuser %}
+            <input name="remove_listing" class="button-delete" type="submit" value="Remove Listing"/>
+            {% endif %}
+        </div>
+    </form>
+</div>
 {% endif %}
 
 <div class="row horizontal-space-evenly mt-50">

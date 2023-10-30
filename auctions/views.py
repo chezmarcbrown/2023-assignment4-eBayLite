@@ -127,7 +127,10 @@ def create(request):
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
     user = User.objects.get(id = request.user.id)
-    watchlist = Watchlist.objects.get(user=request.user)
+    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+
+    if created:
+        watchlist.save()
 
     if request.method == "POST":
         if request.POST.get('comment_input'):
@@ -151,19 +154,21 @@ def categories(request):
     })
 
 def watchlist_add_or_remove(request, listing_id):
-    item_to_save = Listing.objects.get(id=listing_id)
-
+    item = Listing.objects.get(id=listing_id)
     watchlist, created = Watchlist.objects.get_or_create(user=request.user)
     watchlist.save()
 
     # Add item if it doesn't exist in watchlist
     if not watchlist.item.all().filter(pk=listing_id).exists():
-        watchlist.item.add(item_to_save)
+        watchlist.item.add(item)
         watchlist.save()
     # Else remove the item if it does exist
     else:
-        watchlist.item.remove(item_to_save)
+        watchlist.item.remove(item)
         watchlist.save()
         
-
     return redirect(listing, listing_id)
+
+def remove_listing(request, listing_id):
+    Listing.objects.get(id=listing_id).delete()
+    return redirect(index)
