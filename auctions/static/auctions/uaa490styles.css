@@ -74,7 +74,7 @@ body {
 .card-blue {
   display: grid;
   width: 100%;
-  height: 200px;
+  height: 100%;
   color: rgba(0, 195, 255, 0.753);
   background-color: rgb(39, 39, 39);
   border: 3px solid rgba(0, 195, 255, 0.753);

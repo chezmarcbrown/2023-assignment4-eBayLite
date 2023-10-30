@@ -5,12 +5,11 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 
-from .models import User, category_list, Listing, Watchlist
+from .models import User, category_list, Listing, Watchlist, Comment
 
 
 def index(request):
     category = ''
-    watchlist = []
     listings = Listing._meta.model.objects
     
     if 'category' not in request.GET:
@@ -128,14 +127,15 @@ def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
     user = User.objects.get(id = request.user.id)
     watchlist, created = Watchlist.objects.get_or_create(user=request.user)
+    comments = Comment.objects.filter(item = item)
 
     if created:
         watchlist.save()
 
     if request.method == "POST":
         if request.POST.get('comment_input'):
-            item.comments.append(f"{user} commented: " + request.POST.get('comment_input'))
-            item.save()
+            comment = Comment.objects.create(author=request.user, item=item, comment=request.POST.get('comment_input'))
+            comment.save()
             return redirect(listing, listing_id)
         if request.POST.get('place_bid'):
             item.bid = request.POST.get('place_bid')
@@ -145,7 +145,8 @@ def listing(request, listing_id):
     return render(request, "auctions/listing.html" , {
         "listing": item,
         "min_bid": item.bid + 5,
-        "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists()
+        "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists(),
+        "comments": comments
     })
 
 def categories(request):
@@ -172,3 +173,8 @@ def watchlist_add_or_remove(request, listing_id):
 def remove_listing(request, listing_id):
     Listing.objects.get(id=listing_id).delete()
     return redirect(index)
+
+def remove_comment(request, comment_id):
+    listing_id = Comment.objects.get(id=comment_id).item.id
+    Comment.objects.get(id=comment_id).delete()
+    return redirect(listing, listing_id)
