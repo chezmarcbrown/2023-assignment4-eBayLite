@@ -28,8 +28,9 @@ body {
 }
 
 .center {
-  margin-left: 25%;
-  margin-right: 25%;
+  width: 90% !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 .text-center {
@@ -208,6 +209,10 @@ button {
 
 .mt-50 {
   margin-top: 50px;
+}
+
+.p-25 {
+  padding: 25px;
 }
 
 h4 {

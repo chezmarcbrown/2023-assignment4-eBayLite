@@ -131,7 +131,7 @@ def listing(request, listing_id):
 
     if request.method == "POST":
         if request.POST.get('comment_input'):
-            item.comments.append(request.POST.get('comment_input'))
+            item.comments.append(f"{user} commented: " + request.POST.get('comment_input'))
     
     return render(request, "auctions/listing.html" , {
         "listing": item,
