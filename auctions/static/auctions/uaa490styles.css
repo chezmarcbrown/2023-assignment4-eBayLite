@@ -63,7 +63,7 @@ body {
   align-content: space-evenly;
 
   .row {
-    padding: 0px 25px;
+    padding: 25px;
   }
 
   label {
@@ -80,10 +80,6 @@ body {
   border: 3px solid rgba(0, 195, 255, 0.753);
   border-radius: 10px;
   align-content: space-evenly;
-
-  .row {
-    padding: 0px 25px;
-  }
 
   label {
     color: rgba(0, 195, 255, 0.753);
