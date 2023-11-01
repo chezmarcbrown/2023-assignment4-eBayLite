@@ -47,11 +47,11 @@
                 <div>Current price:</div>
                 <div><p><strong style="font-size: 30px">US $ {{ auction.current_bid }}</strong></p></div>
                 <div>Starting bid:</div>
-                <div><p>US $ {{ auction.starting_bid }}</p></div>
+                <div><p>US $ {{ auction.starting_price }}</p></div>
                 <div>Seller:</div>
                 <div><p>{{ auction.seller.username }}</p></div>
                 <div>Created on:</div>
-                <div><p><small>{{ auction.creation_date }}</small></p></div>
+                <div><p><small>{{ auction.create_date }}</small></p></div>
                 <div>Updated on:</div>
                 <div><p><small>{{ auction.update_date }}</small></p></div>
                 <span class="form-text text-muted">{{ bid_Num }} Bid(s) so far.</span>
@@ -116,7 +116,7 @@
             <div class="row">
                 <div class="col">
                     <div><label>Headline:</label></div>
-                    <div>{{ commentForm.headline }}</div>
+                    <div>{{ commentForm.header }}</div>
                 </div>
             </div>
             <div class="row">
@@ -142,11 +142,11 @@
             <div class="card-header">
                 <strong>{{ comment.user.username }}</strong>
                 <div class="text-muted small">
-                    commented on {{ comment.cm_date }}
+                    commented on {{ comment.comment_date }}
                 </div>
             </div>
             <div class="card-body">
-                <h5 class="card-title">{{ comment.headline }}</h5>
+                <h5 class="card-title">{{ comment.header }}</h5>
                 <p class="card-text"> {{ comment.message }}</p>
             </div>
         </div>

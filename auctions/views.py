@@ -106,7 +106,7 @@ def category(request, category_id):
 @login_required(login_url="login")
 def watchlist(request):
     try:
-        watchlist = Watchlist.objects.get_or_create(user=request.user)
+        watchlist, created = Watchlist.objects.get_or_create(user=request.user)
         auctions = watchlist.auctions.all().order_by('-id')
         watchNum = watchlist.auctions.count()
 

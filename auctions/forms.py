@@ -28,7 +28,7 @@ class biddingForm(forms.ModelForm):
 class commentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ["title", "message"]
+        fields = ["headline", "message"]
         widgets = {
             "headline": forms.TextInput(
                 attrs={"placeholder": "Enter title",

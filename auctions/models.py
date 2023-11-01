@@ -16,6 +16,7 @@ class Auction(models.Model):
     title = models.CharField(max_length = 60)
     description = models.TextField(max_length = 480)
     starting_price = models.DecimalField(max_digits = 9, decimal_places = 2, default = 0.00, validators = [MinValueValidator(0)])
+    current_bid = models.DecimalField(max_digits = 9, decimal_places = 2, default = 0.00, validators = [MinValueValidator(0)])
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="auctions", blank=True, null=True)
     imageURL = models.URLField(blank=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auction_seller")
@@ -37,7 +38,7 @@ class Watchlist(models.Model):
 class Bid(models.Model):
     bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bids")
     bid_date = models.DateTimeField(auto_now_add=True)
-    bid_price = models.DecimalField(max_digits=9, decimal_places=2)
+    bid_price = models.DecimalField(max_digits = 9, decimal_places = 2, default = 0.00, validators = [MinValueValidator(0)])
     auction = models.ForeignKey('Auction', on_delete=models.CASCADE, related_name="bids")
 
     def __str__(self):
