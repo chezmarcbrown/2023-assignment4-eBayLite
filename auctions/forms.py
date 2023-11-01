@@ -1,5 +1,5 @@
 from django import forms
-from .models import Auction
+from .models import Auction, Watchlist, Bid, Category, Comment
 
 class listingForm(forms.ModelForm):
     class Meta:
@@ -19,3 +19,24 @@ class listingForm(forms.ModelForm):
                 attrs={"placeholder": "Enter the image URL", 
                        "class": "form-control"})
         }
+
+class biddingForm(forms.ModelForm):
+    class Meta:
+        model = Bid
+        fields = ["bid_price"]
+
+class commentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ["title", "message"]
+        widgets = {
+            "headline": forms.TextInput(
+                attrs={"placeholder": "Enter title",
+                       "class": "form-control"
+            }),
+            "message": forms.Textarea(
+                attrs={"placeholder": "Enter your comment...",
+                       "class": "form-control",
+                       "rows": 4
+            })
+        }        
