@@ -1,5 +1,5 @@
 from django import forms
-from .models import Auction, Watchlist, Bid, Category, Comment
+from .models import Auction, Bid, Comment
 
 class listingForm(forms.ModelForm):
     class Meta:
