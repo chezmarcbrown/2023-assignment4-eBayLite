@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'US/Alaska'
 
 USE_I18N = True
 
@@ -115,6 +115,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+# Media - Was planning on directly uploading pictures, but couldn't get the UI to appear when included on the form
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
