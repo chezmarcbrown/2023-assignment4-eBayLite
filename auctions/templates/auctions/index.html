@@ -3,11 +3,16 @@
 {% block main %}
 <h2>Active Listings</h2>
 
-<article>
-    <section>Listing 1</section>
-
-    <section>Listing 2</section>
-
-    <section>Listing 3</section>
-</article>
+{% for auction in auctions %}
+    {% if auction.closed == False %}
+        <article>
+            <div>
+                <a href="{% url 'auctions:auction' auction.id}">{{ auction.title}}
+            </div>
+            <div>{{ auction.description }}</div>
+            <div> Current Bid : ${{ auction.current_bid }}</div>
+            <div><img src="{{ auction.image_url }}" width="150px"></div>
+        </article>
+    {% endif %}
+{% endfor %}
 {% endblock %}
