@@ -37,7 +37,7 @@ class Migration(migrations.Migration):
                 (
                     "is_superuser",
                     models.BooleanField(
-                        default=False,
+                        default=True,
                         help_text="Designates that this user has all permissions without explicitly assigning them.",
                         verbose_name="superuser status",
                     ),
@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 (
                     "is_staff",
                     models.BooleanField(
-                        default=False,
+                        default=True,
                         help_text="Designates whether the user can log into this admin site.",
                         verbose_name="staff status",
                     ),
