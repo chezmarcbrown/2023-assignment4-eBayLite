@@ -89,7 +89,9 @@ def create_listing(request):
 def auction(request, auction_id):# show the auction you click on
     auction = get_object_or_404(Auction, id=auction_id)
     bid = get_object_or_404(Bid, auction=auction)
-    comments = Comment.objects.filter(auction=auction)
+    # I'm not sure that the objects will be returned in an particular order
+    # comments = Comment.objects.filter(auction=auction)
+    comments = Comment.objects.filter(auction=auction).order_by('-id')
     return render(request, "auctions/auction.html", {
         'auction': auction,
         "bid": bid,
@@ -118,27 +120,27 @@ def category(request, cat_name):# show a list of all auctions within the categor
         "name": cat_name
     })
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='auctions:login')
 def wishlist(request):
     return render(request, "auctions/wishlist.html", {
         'wishlist': request.user.wishlist.all()# displays all on wishlist
     })
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='auctions:login')
 def addwishlist(request, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     request.user.wishlist.add(auction)# adds to the wishlist stored in User
     request.user.save()# saves to database
     return HttpResponseRedirect(reverse("auctions:wishlist"))
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='auctions:login')
 def removewishlist(request, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     request.user.wishlist.remove(auction)
     request.user.save()
     return HttpResponseRedirect(reverse("auctions:wishlist"))
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='auctions:login')
 def makebid(request, bid_id, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     price = request.POST['bid']# gets input from form in auction.html
@@ -155,9 +157,12 @@ def makebid(request, bid_id, auction_id):
             #addwishlist(request, auction_id)
             return HttpResponseRedirect(reverse('auctions:index'))
         else:
+            # should render the page it came from and display an error message
             raise ValueError('Bid needs to be larger than current highest bid')  
+    # render the page it came from with an error message
         
-@login_required(login_url='auctions/login.html')
+        
+@login_required(login_url='auctions:login')
 def comment(request, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     if request.method == "POST":
@@ -168,11 +173,14 @@ def comment(request, auction_id):
             comment.save()
             return HttpResponseRedirect(reverse('auctions:index'))
 
-@login_required(login_url='auctions/login.html')
+
+@login_required(login_url='auctions:login')
 def closebid(request, auction_id):
     #close the auction
     auction = get_object_or_404(Auction, id=auction_id)#get auction object
-    auction.winner = request.user.username# save highest bidder as the winner
+    #auction.winner = request.user.username# save highest bidder as the winner
+    bid = get_object_or_404(Bid, auction=auction)
+    auction.winner = bid.user.username
     auction.closed = True# close the auction
     auction.save()# save to the database
     return HttpResponseRedirect(reverse('auctions:index'))

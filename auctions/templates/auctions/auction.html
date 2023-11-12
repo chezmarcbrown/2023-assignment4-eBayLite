@@ -3,21 +3,21 @@
 {% block main %}
     <article>
     {% if auction.closed == True %}
-        {% if user == bid.user %}
+        {% if user == auction.winner %}
             <h1>You Won!</h1>
-            <h2>Auction #{{auction.id}}</h2>
-            <div>Title: {{auction.title}} Won by {{bid.user.username}}</div>
-            <div>Description: {{ auction.description }}</div>
-            <div>Category: {{auction.category}}</div>    
-            <div><img src="{{ auction.image_url }}" width="200px"></div>
-            <div>Price: {{auction.price}}$</div>
-                <div>Comments: </div>
-                {% for c in comments %}
-                    <div>{{c.user.username}} commented: {{c.comment}}</div>
-                {% empty %}
-                    <div>No Comments</div>
-                {% endfor %}
         {% endif %}
+        <h2>Auction #{{auction.id}}</h2>
+        <div>Title: {{auction.title}} Won by {{bid.user.username}}</div>
+        <div>Description: {{ auction.description }}</div>
+        <div>Category: {{auction.category}}</div>    
+        <div><img src="{{ auction.image_url }}" width="200px"></div>
+        <div>Price: {{auction.price}}$</div>
+            <div>Comments: </div>
+            {% for c in comments %}
+                <div>{{c.user.username}} commented: {{c.comment}}</div>
+            {% empty %}
+                <div>No Comments</div>
+            {% endfor %}
     {% else %}
         <h2>Auction #{{auction.id}}</h2>
         <div>Title: {{auction.title}}</div>

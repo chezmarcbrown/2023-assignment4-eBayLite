@@ -3,23 +3,14 @@
 {% block main %}
 <h2>Active Listings</h2>
 {% for page in auctions %}
-    {% if page.closed == False %}
         <article>
+            {% if page.closed and page.winner == user %}<!--should be working-->
+                <h3>You Won!</h3>
+            {% endif %}
             <div><a href="{% url 'auctions:auction' page.id %}">{{ page.title }}</div>
             <div>Description: {{ page.description }}</div>
             <div>Current Price: {{ page.price }}$</div>
             <div><img src="{{ page.image_url }}" width="200px"></div>
         </article>
-    {% else %}
-        {% if page.winner == user %}<!--doesnt work-->
-            <article>
-                <h3>You Won!</h3>
-                <div><a href="{% url 'auctions:auction' page.id %}">{{ page.title }}</div>
-                <div>Description: {{ page.description }}</div>
-                <div>Current Price: {{ page.price }}$</div>
-                <div><img src="{{ page.image_url }}" width="200px"></div>
-            </article>
-        {% endif %}
-    {% endif %}
 {% endfor %}
 {% endblock %}
