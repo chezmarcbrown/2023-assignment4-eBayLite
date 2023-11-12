@@ -15,3 +15,11 @@ body {
 .form-control {
   width: 50%;
 }
+
+a {
+  text-decoration: none;
+}
+
+.cat {
+  width: 15%
+}
