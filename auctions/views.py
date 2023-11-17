@@ -5,6 +5,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
@@ -21,7 +23,7 @@ def index(request):
     if request.GET.get('watchlist'):
         user = User.objects.get(id = request.user.id)
         watchlist_items =  Watchlist.objects.get(user=request.user).item.all().values_list('pk')
-        listings = listings.filter(id__in=watchlist_items).values()
+        listings = listings.filter(id__in=watchlist_items) #changed
         if listings:
             return render(request, "auctions/index.html", {
                 "listings": listings,
@@ -35,7 +37,7 @@ def index(request):
 
 
     if category is not None:
-        listings = listings.filter(category__icontains=category).values()
+        listings = listings.filter(category__icontains=category) #changed
 
         if listings:
             return render(request, "auctions/index.html", {
@@ -129,6 +131,25 @@ def create(request):
             "categories": category_list
         })
     
+
+def add_comment(request):
+    if request.method == "POST" and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        try:
+            data = json.loads(request.body)
+            listing_id = data['listing_id']
+            comment_text = data['comment_text']
+
+            comment = Comment.objects.create(author=request.user, item_id=listing_id, comment=comment_text)
+
+            return JsonResponse({
+                'author': comment.author.username,
+                'comment': comment.comment,
+            })
+        except json.JSONDecodeError:
+            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
+    else:
+        return JsonResponse({'error': 'Invalid request'}, status=400)
+
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
     comments = Comment.objects.filter(item = item)
@@ -160,9 +181,7 @@ def listing(request, listing_id):
     
     if request.method == "POST":
         if request.POST.get('comment_input'):
-            comment = Comment.objects.create(author=request.user, item=item, comment=request.POST.get('comment_input'))
-            comment.save()
-            return redirect(listing, listing_id)
+            return add_comment(request)
         if request.POST.get('place_bid'):
             item.current_bid = request.POST.get('place_bid')
             bid = Bid.objects.create(author=request.user, item=item, bid=request.POST.get('place_bid'))

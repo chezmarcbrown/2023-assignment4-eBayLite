@@ -152,4 +152,80 @@
         </div>
     </div>
 </div>
+<div class="row center">
+    <div class="col-2">
+        <h4>Comments</h4>
+        <div class="card-gray">
+            {% for comment in comments %}
+            <div class="row center">
+                <div class="col-2 card-gray p-25">
+                    {{ comment.author }} commented: {{ comment.comment }}
+                </div>
+                <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
+                    <div>
+                        {% if user.is_superuser %}
+                        <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+            {% endfor %}
+            
+            <div id="comments-container">
+                <!-- New comments will be added here without refreshing the page -->
+            </div>
+
+            <form id="listing_comments_form" onsubmit="addComment(); return false;">
+                {% csrf_token %}
+                <div class="comment_input">
+                    <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+                    <input class="button" type="submit" value="Add Comment"/>
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+    function addComment() {
+        var newComment = document.getElementById('comment_input').value;
+        var listingId = '{{listing.id}}';
+
+        fetch('../add_comment/', {
+            method:'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify({
+                'comment_text': newComment,
+                'listing_id': listingId,
+            }),
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error('Network response was not ok');
+        })        
+        .then(data => {
+            var commentsContainer = document.getElementById('comments-container');
+            commentsContainer.innerHTML += '<div class="row center"><div class="col-2 card-gray p-25">' + data.author + ' commented: ' + data.comment + '</div></div>';
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
 {% endblock %}
