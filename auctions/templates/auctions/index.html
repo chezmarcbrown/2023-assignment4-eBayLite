@@ -1,5 +1,5 @@
 {% extends "auctions/layout.html" %}
-
+{% load static %}
 {% block main %}
 <h2>{{header}}</h2>
 <article>
@@ -9,7 +9,42 @@
     {% for listing in listings %}
     <section>
         <a href="{% url 'listing' listing.id %}">{{listing.title}}</a>
+        {% if user.is_authenticated and listing.author != user or user.is_superuser %}
+        <span id="watchlist_button">
+            {% if listing not in watchlist %}
+            <img id="{{listing.id}}" class="add" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-line.png' %}" data-value="False" data-listing-id="{{listing.id}}" title="Add To Watchlist"></img>
+            {% else %}
+            <img id="{{listing.id}}" class="remove" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-fill.png' %}" data-value="True" data-listing-id="{{listing.id}}" title="Remove From Watchlist"></img>
+            {% endif %}
+        </span>
+        {% endif %}
     </section>
     {% endfor %}
+
+    <script>
+        
+        function watchlist_button_click(listingId)
+        {
+            var btn = document.getElementById(listingId);
+            console.log(listingId);
+            fetch('../watchlist_add_or_remove/' + btn.dataset.listingId);
+            
+            // Add listing to watchlist
+            if (btn.dataset.value === "False")
+            {
+                btn.dataset.value = "True";
+                btn.src = "{% static 'icons/heart-fill.png' %}";
+                btn.className = "remove";
+            }
+            // Remove listing from watchlist
+            else
+            {
+                btn.dataset.value = "False";
+                btn.src = "{% static 'icons/heart-line.png' %}"
+                btn.className = "add";
+            }
+        }
+    </script>
+
 </article>
 {% endblock %}

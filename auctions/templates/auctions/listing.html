@@ -1,23 +1,43 @@
 {% extends "auctions/layout.html" %}
-
+{% load static %}
 {% block main %}
-<h2>{{listing.title}}</h2>
+<h2>{{listing.title}}
+    {% if user.is_authenticated and listing.author != user or user.is_superuser %}
+        <span id="watchlist_button">
+            {% if listing not in watchlist %}
+            <img id="{{listing.id}}" class="add" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-line.png' %}" data-value="False" data-listing-id="{{listing.id}}" title="Add To Watchlist"></img>
+            {% else %}
+            <img id="{{listing.id}}" class="remove" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-fill.png' %}" data-value="True" data-listing-id="{{listing.id}}" title="Remove From Watchlist"></img>
+            {% endif %}
+        </span>
+    {% endif %}
+</h2>
+
+<script>
+    function watchlist_button_click(listingId)
+        {
+            var btn = document.getElementById(listingId);
+            console.log(listingId);
+            fetch('../watchlist_add_or_remove/' + btn.dataset.listingId);
+            
+            // Add listing to watchlist
+            if (btn.dataset.value === "False")
+            {
+                btn.dataset.value = "True";
+                btn.src = "{% static 'icons/heart-fill.png' %}";
+                btn.className = "remove";
+            }
+            // Remove listing from watchlist
+            else
+            {
+                btn.dataset.value = "False";
+                btn.src = "{% static 'icons/heart-line.png' %}"
+                btn.className = "add";
+            }
+        }
+</script>
 
 <div class="row">
-{% if user.is_authenticated and listing.author != user or user.is_superuser %}
-    <form class="col-2" action="{% url 'watchlist_add_or_remove' listing.id %}" method="GET">
-        <div>
-            {% if listing.id and not is_on_watchlist %}
-            <input name="add_to_watchlist" class="button" type="hidden" value="True"/>
-            <input class="button" type="submit" value="Add to Watchlist"/>
-            {% else %}
-            <input name="remove_from_watchlist" class="button" type="hidden" value="True"/>
-            <input class="button" type="submit" value="Remove from Watchlist"/>
-            {% endif %}
-        </div>
-    </form>
-    
-{% endif %}
     {% if listing.author == user or user.is_superuser %}
     <div class="close_listing">
         {% if user.is_superuser %}
