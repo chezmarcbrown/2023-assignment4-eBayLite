@@ -4,6 +4,9 @@ from django.core.files import File
 from urllib.request import urlopen
 from tempfile import NamedTemporaryFile
 from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+
 
 # DONT FORGET TO MIGRATE AFTER CREATING THIS MODEL
 # run to migrate changes to database:
@@ -11,13 +14,19 @@ from django.core.exceptions import ValidationError
 # > python manage.py makemigrations
 # > python manage.py migrate
 #
+
+
+class User(AbstractUser):
+    pass
 class Category(models.Model):
     name = models.CharField(max_length=50)
+    image = models.ImageField(upload_to='category_images/', blank=True, null=True)
 
     def __str__(self):
         return self.name 
     
 class AuctionListing(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='listings', default=1)
     title = models.CharField(max_length=64)
     description = models.TextField()
     starting_bid = models.IntegerField()
@@ -43,14 +52,3 @@ class Comment(models.Model):
         return f"{self.content} on {self.listing}"
 
 
-class User(AbstractUser):
-    first_name = models.CharField(max_length=64)
-    last_name = models.CharField(max_length=64)
-    email = models.EmailField(max_length=64)
-    password = models.CharField(max_length=64)
-    username = models.CharField(unique=True, max_length=64)
-    bids = models.ManyToManyField(Bid, blank=True, related_name='bids')
-    watchlist = models.ManyToManyField(AuctionListing, blank=True, related_name='watchers')
-    
-    def __str__(self):
-        return f"{self.username} ({self.email})"

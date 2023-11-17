@@ -12,7 +12,7 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from .models import User, AuctionListing, Category, Bid, Comment
@@ -80,13 +80,15 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
-
+@login_required
 def listing(request, listing_id):
     listing = get_object_or_404(AuctionListing, id=listing_id)
     bid_form = BidForm()
     bids = Bid.objects.all()
     comment_form = CommentForm()
     comments = Comment.objects.all()
+    is_creator = request.user.is_authenticated and request.user == listing.creator
+
     return render(
         request,
         "auctions/listing.html",
@@ -96,6 +98,7 @@ def listing(request, listing_id):
             "bid_form": bid_form,
             "comments": comments,
             "comment_form": comment_form,
+            "is_creator": is_creator,
         },
     )
 
@@ -125,10 +128,8 @@ def bid(request, listing_id):
                 messages.error(request, "Bid must be greater than current bid")
                 return redirect("auctions:listing", listing_id=listing.id)
 
-
+@login_required
 def create_listing(request):
-    if not request.user.is_authenticated:
-        return redirect("auctions:login")
     if request.method == "POST":
         auction_form = AuctionForm(request.POST, request.FILES)
         if auction_form.is_valid():
@@ -166,15 +167,11 @@ def watchlist(request, auction_id):
     )
 
 
+@login_required
 def watchlist_view(request):
-    # shows all items on users watchlist if logged in
-    if request.user.is_authenticated:
-        watchlist_items = request.user.watchlist.all()
-        return render(
-            request, "auctions/watchlist.html", {"watchlist_items": watchlist_items}
-        )
-    else:
-        return redirect("auctions:login")
+    watchlist_items = request.user.watchlist.all()
+    return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
+
 
 
 def remove_from_watchlist(request, auction_id):
@@ -187,6 +184,24 @@ def remove_from_watchlist(request, auction_id):
     )
 
 
-def categories(request):
+def category_listings(request, category_id):
+    category = Category.objects.get(id=category_id)
+    listings = AuctionListing.objects.filter(category=category, active=True)  
+    return render(request, "auctions/category_listings.html", {"category": category, "listings": listings})
+
+def category(request):
     categories = Category.objects.all()
     return render(request, "auctions/categories.html", {"categories": categories})
+
+@login_required
+def close_listing(request, listing_id):
+    listing = get_object_or_404(AuctionListing, id=listing_id)
+
+    if request.user != listing.creator:
+        return HttpResponseForbidden("You are not authorized to close this listing.")
+
+    if request.method == "POST":
+        listing.active = False 
+        listing.save()
+        return HttpResponseRedirect(reverse("auctions:listing", args=(listing_id,)))
+
