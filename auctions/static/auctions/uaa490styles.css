@@ -9,7 +9,6 @@ body > header {
 }
 
 body {
-  background-color: red !important;
   grid-template-columns: 10% 80% 10%;
 }
 
