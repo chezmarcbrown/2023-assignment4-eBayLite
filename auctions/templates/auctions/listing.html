@@ -17,7 +17,6 @@
     function watchlist_button_click(listingId)
         {
             var btn = document.getElementById(listingId);
-            console.log(listingId);
             fetch('../watchlist_add_or_remove/' + btn.dataset.listingId);
             
             // Add listing to watchlist
@@ -124,26 +123,32 @@
                 </form>
             </div>
             {% endfor %}
-            
-            <div id="comments-container">
-                <!-- New comments will be added here without refreshing the page -->
-            </div>
 
-            <form id="listing_comments_form" onsubmit="addComment(); return false;">
+            <form id="listing_comments_form" onsubmit="add_comment('{{listing.id}}'); return false;">
                 {% csrf_token %}
                 <div class="comment_input">
                     <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                    <input class="button" type="submit" value="Add Comment"/>
+                    <button id="post">Post Comment</button>
                 </div>
-            </form>
+            </form>     
             
-            <form id="listing_comments" action="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
-                <div class="comment_input">
-                    <textarea name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                    <input class="button" type="submit"/>
-                </div>
-            </form>
-            
+            <div id="unordered">
+                {% for comment in comments %}
+                    <div class="row center">
+                        <div class="col-2 card-gray p-25">
+                            {{ comment.author }} commented: {{ comment.comment }}
+                        </div>
+                        <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
+                            <div>
+                                {% if user.is_superuser %}
+                                    <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
+                                {% endif %}
+                            </div>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+
         </div>
     </div>
     <div class="col-2">
@@ -168,15 +173,21 @@
 </div>
 
 <script>
+    function add_comment(listingId) {
     var postBtn = document.getElementById('post');
     postBtn.addEventListener("click", function() {
         var commentBoxValue = document.getElementById("comment_input").value;
 
-        var li = document.createElement("li");
+        var div = document.createElement("div");
         var text = document.createTextNode(commentBoxValue);
-        li.appendChild(text);
-        document.getElementById("unordered").appendChild(li);
+        div.appendChild(text);
+        document.getElementById("unordered").appendChild(div);
+
+        
+        fetch('../add_comment/' + listingId,);
     });
+
+    }
 </script>
 
 {% endblock %}
