@@ -116,22 +116,28 @@ def comment(request, listing_id):
 
 
 def bid(request, listing_id):
-    if request.method == "POST":
-        bid_form = BidForm(request.POST)
-        if bid_form.is_valid():
-            amount = bid_form.cleaned_data["amount"]
+    if request.method != "POST":
+        return redirect("auctions:listing", listing_id=listing_id)
 
-            listing = get_object_or_404(AuctionListing, id=listing_id)
-            highest_bid = listing.bids.order_by('-amount').first()
-            if not highest_bid:
-                bid = Bid(bidder=request.user)
-            elif amount > highest_bid.amount:
-                bid = Bid(bidder=request.user, amount=amount, listing=listing)
-                bid.save()
-                return redirect("auctions:listing", listing_id=listing.id)
-            else:
-                messages.error(request, "Bid must be greater than current bid")
-                return redirect("auctions:listing", listing_id=listing.id)
+    bid_form = BidForm(request.POST)
+    if not bid_form.is_valid():
+        return redirect("auctions:listing", listing_id=listing_id)
+
+    listing = get_object_or_404(AuctionListing, id=listing_id)
+    bid_amount = bid_form.cleaned_data["amount"]
+
+    if bid_amount <= listing.starting_bid:
+        messages.error(request, "Bid must be greater than starting bid")
+        return redirect("auctions:listing", listing_id=listing.id)
+
+    highest_bid = listing.bids.order_by('-amount').first()
+    if highest_bid and bid_amount <= highest_bid.amount:
+        messages.error(request, "Bid must be greater than current bid")
+        return redirect("auctions:listing", listing_id=listing.id)
+
+    accepted_bid = Bid(bidder=request.user, amount=bid_amount, listing=listing)
+    accepted_bid.save()
+    return redirect("auctions:listing", listing_id=listing.id)
 
 
 @login_required
