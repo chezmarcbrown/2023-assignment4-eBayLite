@@ -2,24 +2,26 @@
 
 {% block main %}
 {% if user.is_authenticated %}
-    <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
+    <a href="{% url 'auctions:watchlist_view' %}">Watchlist</a>
     <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
 {% endif %}
 
 <h1>Watchlist</h1>
 {% for i in watchlist_items %}
-    <h3>{{ i.title }}</h3>
-    <p>{{ i.category }}</p>
-    <p>{{ i.image }}</p>
-    {% if i.active == True %}
+    <p>{{ i.auction_listing.id }}</p>
+    <h3>{{ i.auction_listing.title }}</h3>
+    <p>{{ i.auction_listing.category }}</p>
+    <p>{{ i.auction_listing.image }}</p>
+    {% if i.auction_listing.active == True %}
         <p>Active</p>
     {% else %}
         <p>Not Active</p>
     {% endif %}
-    <form action="{% url 'auctions:remove_from_watchlist' i.id %}" method="post">
+    <form action="{% url 'auctions:remove_from_watchlist' i.auction_listing.id %}" method="post">
         {% csrf_token %}
         <button type="submit">Remove</button>
     </form>
 {% endfor %}
+
 
 {% endblock %}
