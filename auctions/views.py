@@ -12,7 +12,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.forms import model_to_dict
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from .models import User, AuctionListing, Category, Bid, Comment
@@ -87,7 +88,7 @@ def listing(request, listing_id):
     bid_form = BidForm()
     bids = Bid.objects.filter(listing=listing_id).order_by("-amount")
     comment_form = CommentForm()
-    comments = Comment.objects.filter(listing=listing_id).order_by("-date_created")
+    comments = get_comments_data(listing_id)
     is_creator = request.user.is_authenticated and request.user == listing.creator
 
     return render(
@@ -104,6 +105,18 @@ def listing(request, listing_id):
     )
 
 
+def get_comments_data(listing_id):
+    comment_queryset = Comment.objects.filter(listing=listing_id).order_by("-date_created")
+    return [model_to_dict(comment) for comment in comment_queryset]
+
+
+def getComments(request, listing_id):
+    response = {
+        'comments': get_comments_data(listing_id)
+    }
+    return JsonResponse(response)
+
+
 def comment(request, listing_id):
     if request.method == "POST":
         comment_form = CommentForm(request.POST)
@@ -112,7 +125,7 @@ def comment(request, listing_id):
             listing = get_object_or_404(AuctionListing, id=listing_id)
             comment = Comment(commenter=request.user, content=content, listing=listing)
             comment.save()
-            return redirect("auctions:listing", listing_id=listing.id)
+            return JsonResponse({'status':'success'})
 
 
 def bid(request, listing_id):
