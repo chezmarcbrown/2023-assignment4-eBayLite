@@ -22,7 +22,7 @@ from django.contrib import messages
 
 def index(request):
     # show all active listings
-    auctions = AuctionListing.objects.all()
+    auctions = AuctionListing.objects.filter(active=True)
     return render(request, "auctions/index.html", {"auctions": auctions})
 
 
@@ -84,9 +84,9 @@ def register(request):
 def listing(request, listing_id):
     listing = get_object_or_404(AuctionListing, id=listing_id)
     bid_form = BidForm()
-    bids = Bid.objects.all()
+    bids = Bid.objects.filter(listing=listing_id).order_by("-amount")
     comment_form = CommentForm()
-    comments = Comment.objects.all()
+    comments = Comment.objects.filter(listing=listing_id).order_by("-date_created")
     is_creator = request.user.is_authenticated and request.user == listing.creator
 
     return render(
@@ -109,7 +109,7 @@ def comment(request, listing_id):
         if comment_form.is_valid():
             content = comment_form.cleaned_data["content"]
             listing = get_object_or_404(AuctionListing, id=listing_id)
-            comment = Comment(content=content, listing=listing)
+            comment = Comment(commenter=request.user, content=content, listing=listing)
             comment.save()
             return redirect("auctions:listing", listing_id=listing.id)
 
@@ -120,8 +120,9 @@ def bid(request, listing_id):
         if bid_form.is_valid():
             amount = bid_form.cleaned_data["amount"]
             listing = get_object_or_404(AuctionListing, id=listing_id)
-            if amount > listing.starting_bid:
-                bid = Bid(amount=amount, listing=listing)
+            highest_bid = max(listing.bids.amount, default=0)
+            if amount > listing.starting_bid and amount > highest_bid:
+                bid = Bid(bidder=request.user, amount=amount, listing=listing)
                 bid.save()
                 return redirect("auctions:listing", listing_id=listing.id)
             else:
