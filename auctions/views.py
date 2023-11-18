@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -135,7 +136,7 @@ def create(request):
             "categories": category_list
         })
     
-
+@csrf_exempt
 def add_comment(request):
     if request.method == "POST" and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
         try:
