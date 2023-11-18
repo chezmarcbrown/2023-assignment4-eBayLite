@@ -6,8 +6,6 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
 
 from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
@@ -136,24 +134,14 @@ def create(request):
             "categories": category_list
         })
     
-@csrf_exempt
-def add_comment(request):
-    if request.method == "POST" and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
-        try:
-            data = json.loads(request.body)
-            listing_id = data['listing_id']
-            comment_text = data['comment_text']
+    
+def add_comment(request, listing_id):
+    item = Listing.objects.get(id=listing_id)
+    comment, created = Comment.objects.get_or_create(user=request.user)
+    comment.save()
 
-            comment = Comment.objects.create(author=request.user, item_id=listing_id, comment=comment_text)
-
-            return JsonResponse({
-                'author': comment.author.username,
-                'comment': comment.comment,
-            })
-        except json.JSONDecodeError:
-            return JsonResponse({'error': 'Invalid JSON data'}, status=400)
-    else:
-        return JsonResponse({'error': 'Invalid request'}, status=400)
+    return HttpResponse(200)    
+    
 
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
