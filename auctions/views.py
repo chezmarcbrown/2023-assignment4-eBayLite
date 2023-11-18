@@ -1,4 +1,3 @@
-import json
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -133,8 +132,14 @@ def create(request):
     
 def add_comment(request, listing_id):
     item = Listing.objects.get(id=listing_id)
-    comment, created = Comment.objects.get_or_create(user=request.user)
+    comment, created = Comment.objects.get_or_create(author=request.user)
     comment.save()
+
+    comment_text = request.POST.get('comment_input')
+
+    if comment_text:
+        comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
+        comment.save()
 
     return HttpResponse(200)    
     
