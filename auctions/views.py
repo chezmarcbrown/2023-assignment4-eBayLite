@@ -80,6 +80,7 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 @login_required
 def listing(request, listing_id):
     listing = get_object_or_404(AuctionListing, id=listing_id)
@@ -129,15 +130,24 @@ def bid(request, listing_id):
                 messages.error(request, "Bid must be greater than current bid")
                 return redirect("auctions:listing", listing_id=listing.id)
 
+
 @login_required
 def create_listing(request):
     if request.method == "POST":
         auction_form = AuctionForm(request.POST, request.FILES)
         if auction_form.is_valid():
-            auction_form.save()
+            auction = AuctionListing(
+                creator=request.user,
+                title=auction_form.cleaned_data["title"],
+                description=auction_form.cleaned_data["description"],
+                starting_bid=auction_form.cleaned_data["starting_bid"],
+                image_url=auction_form.cleaned_data["image_url"],
+                category=auction_form.cleaned_data["category"],
+            )
+            auction.save()
             messages.success(
                 request,
-                (f'"{ auction_form.cleaned_data["title"] }" was successfully added!'),
+                (f'"{auction.title}" was successfully added!'),
             )
             return redirect("auctions:index")
         else:
@@ -174,7 +184,6 @@ def watchlist_view(request):
     return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
 
-
 def remove_from_watchlist(request, auction_id):
     auction = AuctionListing.objects.get(id=auction_id)
     # removes from users watchlist
@@ -187,12 +196,14 @@ def remove_from_watchlist(request, auction_id):
 
 def category_listings(request, category_id):
     category = Category.objects.get(id=category_id)
-    listings = AuctionListing.objects.filter(category=category, active=True)  
+    listings = AuctionListing.objects.filter(category=category, active=True)
     return render(request, "auctions/category_listings.html", {"category": category, "listings": listings})
+
 
 def category(request):
     categories = Category.objects.all()
     return render(request, "auctions/categories.html", {"categories": categories})
+
 
 @login_required
 def close_listing(request, listing_id):
@@ -202,7 +213,6 @@ def close_listing(request, listing_id):
         return HttpResponseForbidden("You are not authorized to close this listing.")
 
     if request.method == "POST":
-        listing.active = False 
+        listing.active = False
         listing.save()
         return HttpResponseRedirect(reverse("auctions:listing", args=(listing_id,)))
-
