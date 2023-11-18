@@ -35,7 +35,8 @@
                 <input type="float" min="{{ bid.bid }}" name="bid" placeholder="Make Your Bid">
                 <button type="submit">Bid</button>
             </form>
-            <a href="{% url 'auctions:addwishlist' auction.id %}">Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
+            <img></img>
+            <a id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}">Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
             {% if user == auction.user %}<!--fix this-->
                 <a href="{% url 'auctions:closebid' auction.id %}">Close Bidding</a>
             {% endif %}

@@ -176,3 +176,6 @@ def closebid(request, auction_id):
     auction.closed = True# close the auction
     auction.save()# save to the database
     return HttpResponseRedirect(reverse('auctions:index'))
+
+def api_status(request):
+    pass
