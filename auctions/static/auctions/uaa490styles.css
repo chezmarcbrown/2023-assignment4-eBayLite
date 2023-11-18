@@ -12,6 +12,11 @@ body {
   grid-template-columns: 10% 80% 10%;
 }
 
+.restricted-img {
+    max-width: 200px;
+    max-height: 200px;
+}
+
 .form-control {
   width: 50%;
 }

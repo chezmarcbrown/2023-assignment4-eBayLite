@@ -120,9 +120,12 @@ def bid(request, listing_id):
         bid_form = BidForm(request.POST)
         if bid_form.is_valid():
             amount = bid_form.cleaned_data["amount"]
+
             listing = get_object_or_404(AuctionListing, id=listing_id)
-            highest_bid = max(listing.bids.amount, default=0)
-            if amount > listing.starting_bid and amount > highest_bid:
+            highest_bid = listing.bids.order_by('-amount').first()
+            if not highest_bid:
+                bid = Bid(bidder=request.user)
+            elif amount > highest_bid.amount:
                 bid = Bid(bidder=request.user, amount=amount, listing=listing)
                 bid.save()
                 return redirect("auctions:listing", listing_id=listing.id)

@@ -16,7 +16,7 @@
         <p>Title: {{ a.title }}</p>
         <p>Description: {{ a.description }}</p>
         <p>Starting Bid ${{ a.starting_bid }}</p>
-        <p>Image: {{ a.image_url }}</p>
+        <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
         <p>Category: {{ a.category }}</p>
         <form action="{% url 'auctions:watchlist' a.id %}" method="post">
             {% csrf_token %}
