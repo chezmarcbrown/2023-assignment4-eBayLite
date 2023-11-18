@@ -175,7 +175,7 @@
                 <!-- New comments will be added here without refreshing the page -->
             </div>
 
-            <form id="listing_comments_form" onsubmit="addComment(); return false;">
+            <form id="listing_comments_form" onsubmit="addComment(event); return false;">
                 {% csrf_token %}
                 <div class="comment_input">
                     <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
@@ -186,15 +186,14 @@
     </div>
 <script>
     function addComment() {
+        event.preventDefault();
         var newComment = document.getElementById('comment_input').value;
-        var listingId = '{{listing.id}}';
+        var listingId = '{{ listing.id }}';
 
         fetch('../add_comment/', {
-            method:'POST',
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'),
             },
             body: JSON.stringify({
                 'comment_text': newComment,
@@ -213,19 +212,6 @@
         })
         .catch(error => console.error('Error:', error));
     }
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
 </script>
+
 {% endblock %}
