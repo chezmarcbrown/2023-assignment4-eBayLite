@@ -48,9 +48,13 @@ def index(request):
                 "header": f"Active Listings: {category}"
             })
     else:
+        user = User.objects.get(id = request.user.id)
         listings = Listing._meta.model.objects.all()
+        watchlist =  Watchlist.objects.get(user=request.user).item.all()
+        
         return render(request, "auctions/index.html", {
             "listings": listings,
+            "watchlist": watchlist,
             "header": "Active Listings"
         })
 
@@ -127,20 +131,33 @@ def create(request):
     
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
-    user = User.objects.get(id = request.user.id)
-    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
     comments = Comment.objects.filter(item = item)
     bids = Bid.objects.filter(item = item)
+
     winning_bid = Bid.objects.filter(item=item).all().aggregate(Max('bid', default=item.original_bid))['bid__max']
     winner = ""
 
     if bids.filter(bid=winning_bid):
         winner = bids.filter(bid=winning_bid).first().author
-
+        
+    if (request.user.id == None):
+        return render(request, "auctions/listing.html" , {
+            "listing": item,
+            "min_bid": item.current_bid + 5,
+            "comments": comments,
+            "bids": bids,
+            "winner": winner
+    })
+    
+    user = User.objects.get(id = request.user.id)
+    watchlist, created = Watchlist.objects.get_or_create(user=request.user)
 
     if created:
         watchlist.save()
-
+        
+    is_in_watchlist = watchlist.item.all().filter(pk=listing_id).exists()
+    watchlist = list(watchlist.item.all().values_list())
+    
     if request.method == "POST":
         if request.POST.get('comment_input'):
             comment = Comment.objects.create(author=request.user, item=item, comment=request.POST.get('comment_input'))
@@ -156,7 +173,8 @@ def listing(request, listing_id):
     return render(request, "auctions/listing.html" , {
         "listing": item,
         "min_bid": item.current_bid + 5,
-        "is_on_watchlist": watchlist.item.filter(pk=listing_id).exists(),
+        "is_in_watchlist": is_in_watchlist,
+        "watchlist": watchlist,
         "comments": comments,
         "bids": bids,
         "winner": winner
@@ -181,7 +199,7 @@ def watchlist_add_or_remove(request, listing_id):
         watchlist.item.remove(item)
         watchlist.save()
         
-    return redirect(listing, listing_id)
+    return HttpResponse(200)
 
 def remove_listing(request, listing_id):
     Listing.objects.get(id=listing_id).delete()
