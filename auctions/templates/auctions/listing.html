@@ -109,46 +109,30 @@
     <div class="col-2">
         <h4>Comments</h4>
         <div class="card-gray">
-            {% for comment in comments %}
-            <div class="row center">
-                <div class="col-2 card-gray p-25">
-                    {{comment.author}} commented: {{comment.comment}}
-                </div>
-                <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
-                    <div>
-                        {% if user.is_superuser %}
-                        <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
-                        {% endif %}
-                    </div>
-                </form>
-            </div>
-            {% endfor %}
-
-            <form id="listing_comments_form" onsubmit="add_comment('{{listing.id}}'); return false;">
-                {% csrf_token %}
-                <div class="comment_input">
-                    <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                    <button id="post">Post Comment</button>
-                </div>
-            </form>     
-            
             <div id="unordered">
                 {% for comment in comments %}
-                    <div class="row center">
-                        <div class="col-2 card-gray p-25">
-                            {{ comment.author }} commented: {{ comment.comment }}
-                        </div>
-                        <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
-                            <div>
-                                {% if user.is_superuser %}
-                                    <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
-                                {% endif %}
-                            </div>
-                        </form>
+                <div class="row center">
+                    <div class="col-2 card-gray p-25">
+                        {{comment.author}} commented: {{comment.comment}}
                     </div>
+                    <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
+                        <div>
+                            {% if user.is_superuser %}
+                            <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
                 {% endfor %}
-            </div>
 
+                <form id="listing_comments_form" onsubmit="add_comment('{{listing.id}}'); return false;">
+                    {% csrf_token %}
+                    <div class="comment_input">
+                        <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+                        <button id="post">Post Comment</button>
+                    </div>
+                </form>     
+            </div>
         </div>
     </div>
     <div class="col-2">
@@ -174,19 +158,22 @@
 
 <script>
     function add_comment(listingId) {
-    var postBtn = document.getElementById('post');
-    postBtn.addEventListener("click", function() {
-        var commentBoxValue = document.getElementById("comment_input").value;
+        var postBtn = document.getElementById('post');
+        postBtn.addEventListener("click", function() {
+            var commentBoxValue = document.getElementById("comment_input").value;
 
-        var div = document.createElement("div");
-        var text = document.createTextNode(commentBoxValue);
-        div.appendChild(text);
-        document.getElementById("unordered").appendChild(div);
+            if (!document.getElementById("unordered").innerHTML.includes(commentBoxValue)) {
+                var div = document.createElement("div");
+                var commenterName = '{{ user.username }}';
 
-        
-        fetch('../add_comment/' + listingId,);
-    });
 
+                var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
+                div.appendChild(text);
+                document.getElementById("unordered").appendChild(div);
+                
+                fetch('../add_comment/' + listingId,);
+            }
+        });
     }
 </script>
 
