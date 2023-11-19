@@ -17,6 +17,11 @@ body {
     max-height: 200px;
 }
 
+.detail-img {
+    max-width: 800px;
+    max-height: 800px;
+}
+
 .form-control {
   width: 50%;
 }

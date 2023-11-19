@@ -35,10 +35,10 @@
                         {% endif %}
                     </a>
                 </li>
-                <li class="nav-item dropdown {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">
+                <li class="nav-item dropdown {% if is_categories %}active{% endif %}">
                     <a class="nav-link dropdown-toggle" href="{% url 'auctions:categories' %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
                         Categories
-                        {% if request.resolver_match.url_name == 'categories' %}
+                        {% if is_categories %}
                             <span class="sr-only">(current)</span>
                         {% endif %}
                     </a>
