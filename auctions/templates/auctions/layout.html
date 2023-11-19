@@ -9,7 +9,9 @@
         <link href="{% static 'auctions/css/styles.css' %}" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
         <link rel="icon" type="image/png" href="{% static 'auctions/img/icon.png' %}">
-        <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
     <body>
         <h1>Auctions</h1>
@@ -90,6 +92,59 @@
                     });
                 });
             });
+            // Set up CSRF token for AJAX requests
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    }
+                }
+            });
+            
+            $(document).ready(function() {
+                {% if auction %}
+                    $('#comment-form').submit(function(e) {
+                        e.preventDefault();
+                        var formData = $(this).serialize(); // Serialize the form data
+
+                        $.ajax({
+                            url: "{% url 'add_comment' auction.id %}",
+                            type: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                if (response.redirect) {
+                                    window.location.href = response.redirect;
+                                }
+                                else {
+                                    addCommentToPage(response);
+                                    $('#comment-form')[0].reset(); // Reset the form
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors here
+                                console.log("Error: " + error);
+                            }
+                        });
+                    });
+                {% endif %}
+            });
+
+            function addCommentToPage(commentData) {
+                // Create the HTML for the new comment and append it to the comments section
+                var newCommentHtml = '<div class="card mb-3">' +
+                    '<div class="card-header">' +
+                    '<p class="h5 text-muted">' + commentData.user + ' - <span class="text-muted lead">' +
+                    commentData.created_at + '</span></p>' +
+                    '</div>' +
+                    '<div class="card-body">' +
+                    '<p class="card-text lead">' + commentData.text + '</p>' +
+                    '</div>' +
+                    '</div>';
+
+                // Append the new comment to the comments section
+                // Assuming the comments section has an ID or class for selection
+                $('#comments-section').append(newCommentHtml);
+    }
         </script>
         
         {# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.js"></script> #}

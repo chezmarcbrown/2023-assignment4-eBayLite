@@ -2,7 +2,8 @@
 
 {% block body %}
     <h2>Active Listings</h2>
-    {% for item in listings %}
+    <div id="listings-accordian">
+        {% for item in listings %}
         <div class="container pb-5 mt-n2 mt-md-n3">
             <div class="row">
                 <div class="col-xl-9 col-md-8">
@@ -60,4 +61,6 @@
             </div>
         </div>
     {% endfor %}
+    </div>
+    
 {% endblock %}

@@ -7,7 +7,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from .models import User, AuctionListing, Bid, Comment, Category
 from .forms import AuctionListingForm, CommentForm
-
+from django.http import JsonResponse
 def index(request):
     return render(request, "auctions/index.html", {
         "listings": AuctionListing.objects.all().order_by('-created_at'),
@@ -200,23 +200,26 @@ def filter(request):
     
     return render(request, 'auctions/category.html', context)
 
+@login_required(login_url='login')
 def add_comment(request, id):
-    anonymous = User.first_name
-    if request.user is not anonymous:
+    if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         form = CommentForm(request.POST)
         if form.is_valid():
-            f = form.cleaned_data
+            comment_text = form.cleaned_data['text']
             comment = Comment(
                 user=request.user,
-                auction=get_object_or_404(AuctionListing, id=id),
-                **f
+                text=comment_text,
+                auction=get_object_or_404(AuctionListing, id=id)
             )
             comment.save()
-            return HttpResponseRedirect(reverse('listing', kwargs={
-                'id': id
-            }))
-    else:
-        return render(request, 'auctions/login.html', {
-            'message': 'Must be logged in to be able to comment!'
-        })
+
+            # Prepare and send the JSON response
+            comment_data = {
+                'user': str(comment.user),
+                'text': comment.text,
+                'created_at': comment.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            }
+            return JsonResponse(comment_data)
+        else:
+            return JsonResponse({'error': form.errors}, status=400)
     
