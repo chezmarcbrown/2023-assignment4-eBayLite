@@ -78,14 +78,16 @@ document.addEventListener('DOMContentLoaded', function() {
     //console.log(listingId)
 
     header.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        event.preventDefault(); // some reason this stops from executing on refresh aswell
         const listingId = this.dataset//get the listing id
         console.log(listingId)
+        const number = 23;//testing on minecraft listing temp
+        console.log(number)
         console.log(header.innerHTML)
         if (document.querySelector('#foo').src === "https://cdn-icons-png.flaticon.com/512/73/73814.png") {
             document.querySelector('#foo').src = "https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png"
             //call add to watchlist function
-            //fetch("addtowishlist/", listingId, "/")
+            fetch('addwishlist/'+number+'/')//page not found
         }
         else {
             document.querySelector('#foo').src = "https://cdn-icons-png.flaticon.com/512/73/73814.png"
