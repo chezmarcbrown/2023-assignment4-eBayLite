@@ -19,8 +19,7 @@ from django.urls import reverse
 from .models import User, AuctionListing, Category, Bid, Comment, Watchlist
 from .forms import AuctionForm, BidForm, CommentForm
 from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
+
 
 
 def index(request):

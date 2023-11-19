@@ -19,7 +19,7 @@
                 <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{ a.title }}: </a></h4>
                 <p>Description: {{ a.description }}</p>
                 <p>Starting Bid ${{ a.starting_bid }}</p>
-                <p>Image: {{ a.image_url }}</p>
+                <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
                 <p>Category: {{ a.category }}</p>
                 {% if a.id in watchlist_ids %}
                   <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
