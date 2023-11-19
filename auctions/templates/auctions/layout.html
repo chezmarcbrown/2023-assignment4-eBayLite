@@ -3,36 +3,160 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}Auctions{% endblock %}</title>
-        <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
-        <link rel="stylesheet" href="{% static 'auctions/uaa490styles.css' %}" >
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+              integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+        <link href="{% static 'auctions/css/styles.css' %}" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+        <link rel="icon" type="image/png" href="{% static 'auctions/img/icon.png' %}">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
     </head>
     <body>
-        <header>
-            <h1>Auctions "R" Us</h1>
-            <nav>
-                <span>
-                    <a href="{% url 'index' %}">Active Listings</a>
-                    <a href="#">Categories</a>
-                    <a href="#">Watchlist</a>
-                    <a href="#">Create Listing</a>
-                </span>
-                <span>
-                    {% if user.is_authenticated %}
-                        Welcome <strong>{{ user.username }}!</strong>
-                        <a href="{% url 'logout' %}">Log Out</a>
-                    {% else %}
-                        <a href="{% url 'login' %}">Log In</a>
-                        <a href="{% url 'register' %}">Register</a>
-                    {% endif %}
-                </span>
-            </nav>
-        </header>
-        <main>
-            {% block main %}
-            {% endblock %}
-        </main>
+        <h1>Auctions</h1>
+        <div>
+            {% if user.is_authenticated %}
+                Signed in as <strong>{{ user.username }}</strong>.
+            {% else %}
+                Not signed in.
+            {% endif %}
+        </div>
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'index' %}">Active Listings</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'categories' %}">Categories</a>
+            </li>
+            {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'create' %}">Create Listing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'watchlist' %}">WatchList <span class="badge bg-info" id="watchlist-counter">{{ watchlist_count }}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'logout' %}">Log Out</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'login' %}">Log In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'register' %}">Register</a>
+                </li>
+            {% endif %}
+        </ul>
+        <hr>
+        {% block body %}
+        {% endblock %}
+
+        <script>
+            $(document).ready(function() {
+                $(document).on('click', '.watchlist-toggle', function(e) {
+                    e.preventDefault();
+                    var link = $(this);
+                    var action = link.data('action');
+                    var itemId = link.data('id'); 
+                    var url = (action === 'watch') ? `/watch/${itemId}` : `/unwatch/${itemId}`;
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        success: function(data) {
+                            console.log('AJAX Success:', data);
+                            if (data.success) {
+                                $('#watchlist-counter').text(data.watchlist_count);
+
+
+                                if (action === 'unwatch') {
+                                    link.data('action', 'watch');
+                                    link.html('<i class="far fa-heart"></i>');
+                                    // Remove the item if it's on the watchlist page
+                                    if (window.location.pathname === '/watchlist') {
+                                        link.closest('.item-container').remove();
+                                    }
+                                } else {
+                                    link.data('action', 'unwatch');
+                                    link.html('<i class="fa fa-heart"></i>');
+                                }
+                                var newUrl = (action === 'watch') ? `/unwatch/${itemId}` : `/watch/${itemId}`;
+                                link.data('url', newUrl);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log("Error: " + error);
+                        }
+                    });
+                });
+            });
+            // Set up CSRF token for AJAX requests
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    if (!this.crossDomain) {
+                        xhr.setRequestHeader("X-CSRFToken", '{{ csrf_token }}');
+                    }
+                }
+            });
+            
+            $(document).ready(function() {
+                {% if auction %}
+                    $('#comment-form').submit(function(e) {
+                        e.preventDefault();
+                        var formData = $(this).serialize(); // Serialize the form data
+
+                        $.ajax({
+                            url: "{% url 'add_comment' auction.id %}",
+                            type: 'POST',
+                            data: formData,
+                            success: function(response) {
+                                if (response.redirect) {
+                                    window.location.href = response.redirect;
+                                }
+                                else {
+                                    addCommentToPage(response);
+                                    $('#comment-form')[0].reset(); // Reset the form
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                // Handle errors here
+                                console.log("Error: " + error);
+                            }
+                        });
+                    });
+                {% endif %}
+            });
+
+            function addCommentToPage(commentData) {
+                // Create the HTML for the new comment and append it to the comments section
+                var newCommentHtml = '<div class="card mb-3">' +
+                    '<div class="card-header">' +
+                    '<p class="h5 text-muted">' + commentData.user + ' - <span class="text-muted lead">' +
+                    commentData.created_at + '</span></p>' +
+                    '</div>' +
+                    '<div class="card-body">' +
+                    '<p class="card-text lead">' + commentData.text + '</p>' +
+                    '</div>' +
+                    '</div>';
+
+                // Append the new comment to the comments section
+                // Assuming the comments section has an ID or class for selection
+                $('#comments-section').append(newCommentHtml);
+    }
+        </script>
+        
+        {# <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.js"></script> #}
+
+        <script>
+            $(document).ready(function() {
+                $("#listings-accordion").accordion({
+                    collapsible: true,
+                    heightStyle: "content"
+                });
+            });
+        </script>
+        
     </body>
 </html>
