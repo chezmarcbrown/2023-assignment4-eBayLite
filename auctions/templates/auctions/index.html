@@ -1,31 +1,66 @@
-{% extends "auctions/layout.html" %} {% block main %}
+{% extends "auctions/layout.html" %}
+{% block main %}
 
 <h2>Active Listings</h2>
 {% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
+    <ul class="messages">
+        {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}}>{{ message }}</li>
+        {% endfor %}
+    </ul>
 {% endif %}
-<article>
-  {% for a in auctions %}
-    {% if a.active == True %}
-    <section>
-        <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{a.id}}: </a></h4>
-        <p>Title: {{ a.title }}</p>
-        <p>Description: {{ a.description }}</p>
-        <p>Starting Bid ${{ a.starting_bid }}</p>
-        <p>Image: {{ a.image_url }}</p>
-        <p>Category: {{ a.category }}</p>
-        <form action="{% url 'auctions:watchlist' a.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Add to Watchlist</button>
-        </form>
-      </section>
-    {% endif %}
 
-  {% endfor %}
+<input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+<article>
+    {% for a in auctions %}
+        {% if a.active %}
+            <section>
+                <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{ a.id }}: </a></h4>
+                <p>Title: {{ a.title }}</p>
+                <p>Description: {{ a.description }}</p>
+                <p>Starting Bid ${{ a.starting_bid }}</p>
+                <p>Image: {{ a.image_url }}</p>
+                <p>Category: {{ a.category }}</p>
+                {% if a.id in watchlist_ids %}
+                    <i class="fa-soild fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                {% else %}
+                    <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                {% endif %}
+            </section>
+        {% endif %}
+    {% endfor %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+      $(document).ready(function() {
+        var csrfToken = $('#csrfToken').val(); 
+    
+        $('.watchlist-icon').click(function() {
+            console.log("Icon clicked, auction ID: ", $(this).data('listing-id'));
+            var auctionId = $(this).data('listing-id');
+            var icon = $(this); 
+
+            $.ajax({
+                url: '/watchlist/' + auctionId + '/', 
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: csrfToken
+                },
+                success: function(response) {
+                    if (response.added) {
+                        icon.removeClass('fa-regular').addClass('fa-solid');
+                    } else {
+                        icon.removeClass('fa-solid').addClass('fa-regular');
+                    }
+                },
+                error: function() {
+                    console.error('Error toggling watchlist item.');
+                }
+            });
+        });
+    });
+    
+    </script>
 </article>
 
 {% endblock %}

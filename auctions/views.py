@@ -18,6 +18,8 @@ from django.urls import reverse
 from .models import User, AuctionListing, Category, Bid, Comment, Watchlist
 from .forms import AuctionForm, BidForm, CommentForm
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 
 def index(request):
@@ -161,20 +163,26 @@ def create_listing(request):
         "auctions/create_listing.html",
         {"auction_form": auction_form, "auctions": auctions},
     )
-
-
+    
+    
 @login_required
 def watchlist(request, auction_id):
-    try:
-        auction = AuctionListing.objects.get(id=auction_id)
-    except AuctionListing.DoesNotExist:
-        raise Http404("Auction does not exist")
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
+       
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        if not created:  
+            watchlist_item.delete()
+            added = False
+        else:
+            added = True
 
-    if not Watchlist.objects.filter(user=request.user, auction_listing=auction).exists():
-        Watchlist.objects.create(user=request.user, auction_listing=auction)
+        return JsonResponse({"success": "Watchlist updated", "added": added}, status=200)
 
-    return HttpResponseRedirect(reverse("auctions:watchlist_view"))
-
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
@@ -185,19 +193,17 @@ def watchlist_view(request):
 
 @login_required
 def remove_from_watchlist(request, auction_id):
-    try:
-        auction = AuctionListing.objects.get(id=auction_id)
-    except AuctionListing.DoesNotExist:
-        raise Http404("Auction does not exist")
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
 
-    try:
-        watchlist_item = Watchlist.objects.get(user=request.user, auction_listing=auction)
-    except Watchlist.DoesNotExist:
-        raise Http404("Watchlist item does not exist")
+        request.user.watchlist.remove(auction)
+        return JsonResponse({"success": "Removed from watchlist"}, status=200)
 
-    watchlist_item.delete()
-    return HttpResponseRedirect(reverse("auctions:watchlist_view"))
-
+    return JsonResponse({"error": "Invalid request"}, status=400)
+    
 
 def category_listings(request, category_id):
     category = Category.objects.get(id=category_id)
