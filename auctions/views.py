@@ -132,24 +132,21 @@ def create(request):
             "categories": category_list
         })
     
-from django.http import JsonResponse
+
 
 def add_comment(request, listing_id):
-    if request.method == 'POST' and request.is_ajax():
-        item = Listing.objects.get(id=listing_id)
-        comment_text = request.POST.get('comment_input')
+    item = Listing.objects.get(id=listing_id)
+    comment, created = Comment.objects.get_or_create(author=request.user)
+    comment.save()
 
-        if comment_text:
-            comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
-            comment.save()
+    comment_text = request.POST.get('comment_input')
 
-            response_data = {
-                'author': comment.author.username,
-                'comment': comment.comment,
-            }
-            return JsonResponse({'post': response_data})
+    if comment_text:
+        comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
+        comment.save()
 
-    return JsonResponse({'error': 'Bad Request'}, status=400)
+    return HttpResponse(200)  
+
 
 
 def listing(request, listing_id):
