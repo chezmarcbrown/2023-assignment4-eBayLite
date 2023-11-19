@@ -12,24 +12,40 @@
 
     <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
-    <article>
+    <div class="accordion" id="accordionListing">
         {% for a in auctions %}
             {% if a.active %}
-                <section>
-                    <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{ a.title }}: </a></h4>
-                    <p>Description: {{ a.description }}</p>
-                    <p>Starting Bid ${{ a.starting_bid }}</p>
-                    <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
-                    <p>Category: {{ a.category }}</p>
-                    {% if a.id in watchlist_ids %}
-                        <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
-                    {% else %}
-                        <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
-                    {% endif %}
-                </section>
+                <div class="card">
+                    <div class="card-header" id="heading{{ a.id }}">
+                        <h4 class="mb-0">
+                            <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse"
+                                    data-target="#collapse{{ a.id }}" aria-expanded="true"
+                                    aria-controls="collapse{{ a.id }}" aria-label="{{ a.title }}">
+                                {{ a.title }}
+                            </button>
+                        </h4>
+                    </div>
+                    <div id="collapse{{ a.id }}" class="collapse" aria-labelledby="heading{{ a.id }}"
+                         data-parent="#accordionListing">
+                        <div class="card-body">
+                            <a href="{% url 'auctions:listing' a.id %}">Details</a>
+                            <p>Description: {{ a.description }}</p>
+                            <p>Starting Bid ${{ a.starting_bid }}</p>
+                            {% if a.image_url %}
+                                <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
+                            {% endif %}
+                            <p>Category: {{ a.category }}</p>
+                            {% if a.id in watchlist_ids %}
+                                <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                            {% else %}
+                                <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
             {% endif %}
         {% endfor %}
-    </article>
+    </div>
 
     <script>
         $(document).ready(function () {
@@ -59,9 +75,5 @@
                 });
             });
         });
-
-        {#        $(function () {#}
-        {#            $("#accordion").accordion();#}
-        {#        });#}
     </script>
 {% endblock %}
