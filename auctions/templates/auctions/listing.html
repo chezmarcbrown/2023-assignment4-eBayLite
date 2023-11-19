@@ -4,7 +4,7 @@
 <h2>{{listing.title}}
     {% if user.is_authenticated and listing.author != user or user.is_superuser %}
         <span id="watchlist_button">
-            {% if listing not in watchlist %}
+            {% if not is_in_watchlist %}
             <img id="{{listing.id}}" class="add" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-line.png' %}" data-value="False" data-listing-id="{{listing.id}}" title="Add To Watchlist"></img>
             {% else %}
             <img id="{{listing.id}}" class="remove" onclick="watchlist_button_click('{{listing.id}}')" src="{% static 'icons/heart-fill.png' %}" data-value="True" data-listing-id="{{listing.id}}" title="Remove From Watchlist"></img>

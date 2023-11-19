@@ -11,16 +11,23 @@ from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
 def index(request):
     category = ''
-    listings = Listing._meta.model.objects
+    listings = Listing._meta.model.objects.all()
+    watchlist = None
+    user = None
+
+    if User.objects.filter(id=request.user.id).exists():
+        user = User.objects.get(id = request.user.id)
+        watchlist =  Watchlist.objects.get(user=request.user).item.all()
     
     if 'category' not in request.GET:
         category = None
     else:
         category = request.GET['category']
         
+    # Display watchlist
     if request.GET.get('watchlist'):
         user = User.objects.get(id = request.user.id)
-        watchlist_items =  Watchlist.objects.get(user=request.user).item.all().values_list('pk')
+        watchlist_items =  watchlist.values_list('pk')
         listings = listings.filter(id__in=watchlist_items).values()
         if listings:
             return render(request, "auctions/index.html", {
@@ -33,13 +40,14 @@ def index(request):
                 "header": f"Watchlist"
             })
 
-
+    # Display listings belonging to category
     if category is not None:
-        listings = listings.filter(category__icontains=category).values()
+        listings = listings.filter(category__icontains=category).all()
 
         if listings:
             return render(request, "auctions/index.html", {
                 "listings": listings,
+                "watchlist": watchlist,
                 "header": f"Active Listings: {category}"
             })
         else:
@@ -47,16 +55,12 @@ def index(request):
                 "message": "There are no active listings for this category.",
                 "header": f"Active Listings: {category}"
             })
-    else:
-        user = User.objects.get(id = request.user.id)
-        listings = Listing._meta.model.objects.all()
-        watchlist =  Watchlist.objects.get(user=request.user).item.all()
         
-        return render(request, "auctions/index.html", {
-            "listings": listings,
-            "watchlist": watchlist,
-            "header": "Active Listings"
-        })
+    return render(request, "auctions/index.html", {
+        "listings": listings,
+        "watchlist": watchlist,
+        "header": "Active Listings"
+    })
 
 def login_view(request):
     if request.method == "POST":
