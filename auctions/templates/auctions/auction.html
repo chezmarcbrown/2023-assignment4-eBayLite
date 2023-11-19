@@ -36,16 +36,22 @@
                 <button type="submit">Bid</button>
             </form>
             <img></img>
+
             
-            <div id="watchlist-icon" data-listing-id="{{ auction.id }}" class="{% if auction_in_watchlist %}on{% else %}off{% endif %}">
-                <!-- maybe use different icons for on and off states -->
-                {% if auction_in_watchlist %}Watchlisted{% else %}Not Watchlisted{% endif %}
-            </div>
 
             <a id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}">Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
             {% if user == auction.user %}<!--fix this-->
                 <a href="{% url 'auctions:closebid' auction.id %}">Close Bidding</a>
             {% endif %}
+
+            <div id="watchlist-icon" data-listing-id="{{ auction.id }}" class="{% if auction_in_watchlist %} on {% else %} off {% endif %}">
+                <!-- maybe use different icons for on and off states -->
+                {% if auction_in_watchlist %}
+                    <i class="fas fa-heart"></i>Watchlisted
+                {% else %} 
+                    <i class="far fa-heart"></i>Not Watchlisted
+                {% endif %}
+            </div>
 
         {% endif %}
             <div>Comments: </div>
