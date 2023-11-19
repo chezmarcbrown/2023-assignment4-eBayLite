@@ -29,3 +29,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const commentForm = document.getElementById('comment-form');
+    const commentsContainer = document.getElementById('comments-container');
+
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Check if the user is authenticated
+            if (user.is_authenticated){
+                const formData = new FormData(commentForm);
+
+                // Send an AJAX request to add a new comment
+                fetch(commentForm.action, {
+                    method: 'POST',
+                    body: formData,
+                })
+                    .then(response => response.text())
+                    .then(data => {
+                        // Append the new comment to the comments container
+                        commentsContainer.innerHTML += data;
+                        // Clear the comment form
+                        commentForm.reset();
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+});

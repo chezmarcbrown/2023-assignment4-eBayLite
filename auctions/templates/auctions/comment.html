@@ -2,10 +2,19 @@
 
 {% block main %}
     <h2>Comment on this listing</h2> <br>
-    <form action="{% url 'auctions:comment' auction.id %}" method="POST">
+    <form id="comment-form" action="{% url 'auctions:comment' auction.id %}" method="POST">
         {% csrf_token %}
         {{ form.as_p }}
         <br>
         <input class="btn btn-primary" type="submit" value="Create">
     </form>
+
+    <div id="comments-container">
+        <!-- Existing comments go here -->
+        {% for c in comments %}
+            <div>{{ c.user.username }} commented: {{ c.comment }}</div>
+        {% empty %}
+            <div>No Comments Yet</div>
+        {% endfor %}
+        </div>
 {% endblock %}
