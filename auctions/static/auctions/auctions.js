@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 //this.classList.toggle('far');
 
                 // Send an AJAX request to toggle watchlist status
-                //fetch(`/toggle_watchlist/${listingId}/`) // ---- this one is using previous 'toggle_watchlist' view ---
-                fetch("api/status")
+                fetch(`/toggle_watchlist/${listingId}/`) // ---- this one is using previous 'toggle_watchlist' view ---
+                //fetch("api/status")
                     .then(response => response.json())
                     .then(data => {
                         // Update the icon state

@@ -5,6 +5,9 @@ from django.db import models
 class User(AbstractUser):
     wishlist = models.ManyToManyField('Auction', related_name='wishlist', blank=True)
 
+    def active_auctions(self):
+        return Auction.objects.filter(active = True)
+
 class Auction(models.Model):
 
     FASHION = "Fashion"
@@ -27,6 +30,7 @@ class Auction(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     category = models.CharField(max_length=20, choices=CATEGORIES, blank=False)
     image_url = models.URLField(default='')
+    active = models.BooleanField(default=True)
     closed = models.BooleanField(default=False)
     winner = models.CharField(max_length=70, blank=True, null=True)
 

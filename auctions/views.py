@@ -178,7 +178,7 @@ def closebid(request, auction_id):
     auction.save()# save to the database
     return HttpResponseRedirect(reverse('auctions:index'))
 
-'''
+
 def toggle_watchlist(request, auction_id):
     if request.method == 'POST' and request.user.is_authenticated:
         listing = get_object_or_404(Auction, pk=auction_id)
@@ -194,8 +194,8 @@ def toggle_watchlist(request, auction_id):
         return JsonResponse({'is_watchlisted': is_watchlisted})
 
     return JsonResponse({'error': 'Invalid request'})
-'''
 
+'''
 def api_status(request, auction_id):
     if request.method == 'POST' and request.user.is_authenticated:
         listing = get_object_or_404(Auction, pk=auction_id)
@@ -211,3 +211,4 @@ def api_status(request, auction_id):
         return JsonResponse({'is_watchlisted': is_watchlisted})
 
     return JsonResponse({'error': 'Invalid request'})
+'''

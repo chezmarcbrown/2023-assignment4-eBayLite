@@ -18,7 +18,7 @@ urlpatterns = [
     path("makebid/<int:bid_id>/<int:auction_id>", views.makebid, name="makebid"),
     path("comment/<int:auction_id>", views.comment, name="comment"),
     path("closebid/<int:auction_id>", views.closebid, name="closebid"),
-   # path('toggle_watchlist/<int:listing_id>/', views.toggle_watchlist, name='toggle_watchlist'),
-    path("api/status", views.api_status, name="api_status"),
+    path('toggle_watchlist/<int:listing_id>/', views.toggle_watchlist, name='toggle_watchlist'),
+   # path("api/status", views.api_status, name="api_status"),
 
 ]

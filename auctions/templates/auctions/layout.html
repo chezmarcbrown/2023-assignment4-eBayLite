@@ -9,8 +9,7 @@
         <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css">
         <link rel="stylesheet" href="{% static 'auctions/uaa490styles.css' %}" >
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <script>
-            src="{% static 'auctions/auctions.js'%}"
+        <script src="{% static 'auctions/auctions.js'%}">
             //function watchlist() {
             //    const header = document.querySelector('#wishlist');
               //  if (header.innerHTML === ) 
@@ -24,8 +23,12 @@
             <h1>Auctions "R" Us</h1>
             <nav>
                 <span>
-                    <a href="{% url 'auctions:index' %}">Active Listings</a>
-                    <a href="{% url 'auctions:categories' %}">Categories</a>
+                    <a href="{% url 'auctions:index' %}"> Active Listings - 
+                        <span> {{ user.active_auctions.all.count }} </span> 
+                    </a>
+                    <a href="{% url 'auctions:categories' %}">Categories - 
+                        <span> {{ user.active_auctions.all.count }} </span>
+                    </a>
                     <a href="{% url 'auctions:wishlist' %}">Watchlist</a>
                     <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
                 </span>
