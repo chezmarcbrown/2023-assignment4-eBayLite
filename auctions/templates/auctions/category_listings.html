@@ -1,4 +1,7 @@
 {% extends "auctions/layout.html" %}
+
+{% block title %}Auctions - {{ category.name }}{% endblock %}
+
 {% block main %}
     <h1>Listings in {{ category.name }}</h1>
     <ul>
@@ -17,34 +20,4 @@
     </ul>
 
     <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-    <script>
-        $(document).ready(function () {
-            var csrfToken = $('#csrfToken').val();
-
-            $('.watchlist-icon').click(function () {
-                console.log("Icon clicked, auction ID: ", $(this).data('listing-id'));
-                var auctionId = $(this).data('listing-id');
-                var icon = $(this);
-
-                $.ajax({
-                    url: '/watchlist/' + auctionId + '/',
-                    method: 'POST',
-                    data: {
-                        csrfmiddlewaretoken: csrfToken
-                    },
-                    success: function (response) {
-                        if (response.added) {
-                            icon.removeClass('fa-regular').addClass('fa-solid');
-                        } else {
-                            icon.removeClass('fa-solid').addClass('fa-regular');
-                        }
-                    },
-                    error: function () {
-                        console.error('Error toggling watchlist item.');
-                    }
-                });
-            });
-        });
-    </script>
 {% endblock %}

@@ -1,5 +1,7 @@
 {% extends "auctions/layout.html" %}
 
+{% block title %}Auction - {{ listing.title }}{% endblock %}
+
 {% block main %}
     {% if messages %}
         <ul class="messages">
@@ -8,19 +10,22 @@
             {% endfor %}
         </ul>
     {% endif %}
-    <h1>Listing</h1>
+
+    <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
     {% if listing.active %}
-        <h3>{{ listing.title }}</h3>
+        <h2>{{ listing.title }}</h2>
         <p>{{ listing.description }}</p>
         <p>Starting Bid: {{ listing.starting_bid }}</p>
         <p>Category: {{ listing.category }}</p>
+        {% if listing.id in watchlist_ids %}
+            <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+        {% else %}
+            <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+        {% endif %}
         <p><img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="detail-img"></p>
 
-        <form action="{% url 'auctions:watchlist' listing.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Add to Watchlist</button>
-        </form>
+
 
         <form action="{% url 'auctions:bid' listing.id %}" method="post">
             {% csrf_token %}

@@ -94,6 +94,7 @@ def listing(request, listing_id):
     comment_form = CommentForm()
     comments = get_comments_data(listing_id)
     is_creator = request.user.is_authenticated and request.user == listing.creator
+    watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
 
     return render(
         request,
@@ -105,6 +106,7 @@ def listing(request, listing_id):
             "comments": comments,
             "comment_form": comment_form,
             "is_creator": is_creator,
+            "watchlist_ids": watchlist_ids
         },
     )
 

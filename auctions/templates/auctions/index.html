@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 {% block main %}
 
-    <h2>Active Listings</h2>
+    <h1>Active Listings</h1>
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -46,34 +46,4 @@
             {% endif %}
         {% endfor %}
     </div>
-
-    <script>
-        $(document).ready(function () {
-            var csrfToken = $('#csrfToken').val();
-
-            $('.watchlist-icon').click(function () {
-                console.log("Icon clicked, auction ID: ", $(this).data('listing-id'));
-                var auctionId = $(this).data('listing-id');
-                var icon = $(this);
-
-                $.ajax({
-                    url: '/watchlist/' + auctionId + '/',
-                    method: 'POST',
-                    data: {
-                        csrfmiddlewaretoken: csrfToken
-                    },
-                    success: function (response) {
-                        if (response.added) {
-                            icon.removeClass('fa-regular').addClass('fa-solid');
-                        } else {
-                            icon.removeClass('fa-solid').addClass('fa-regular');
-                        }
-                    },
-                    error: function () {
-                        console.error('Error toggling watchlist item.');
-                    }
-                });
-            });
-        });
-    </script>
 {% endblock %}
