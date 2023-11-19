@@ -12,7 +12,8 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.forms import model_to_dict
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from .models import User, AuctionListing, Category, Bid, Comment
@@ -87,7 +88,7 @@ def listing(request, listing_id):
     bid_form = BidForm()
     bids = Bid.objects.filter(listing=listing_id).order_by("-amount")
     comment_form = CommentForm()
-    comments = Comment.objects.filter(listing=listing_id).order_by("-date_created")
+    comments = get_comments_data(listing_id)
     is_creator = request.user.is_authenticated and request.user == listing.creator
 
     return render(
@@ -104,6 +105,18 @@ def listing(request, listing_id):
     )
 
 
+def get_comments_data(listing_id):
+    comment_queryset = Comment.objects.filter(listing=listing_id).order_by("-date_created")
+    return [model_to_dict(comment) for comment in comment_queryset]
+
+
+def getComments(request, listing_id):
+    response = {
+        'comments': get_comments_data(listing_id)
+    }
+    return JsonResponse(response)
+
+
 def comment(request, listing_id):
     if request.method == "POST":
         comment_form = CommentForm(request.POST)
@@ -112,23 +125,32 @@ def comment(request, listing_id):
             listing = get_object_or_404(AuctionListing, id=listing_id)
             comment = Comment(commenter=request.user, content=content, listing=listing)
             comment.save()
-            return redirect("auctions:listing", listing_id=listing.id)
+            return JsonResponse({'status':'success'})
 
 
 def bid(request, listing_id):
-    if request.method == "POST":
-        bid_form = BidForm(request.POST)
-        if bid_form.is_valid():
-            amount = bid_form.cleaned_data["amount"]
-            listing = get_object_or_404(AuctionListing, id=listing_id)
-            highest_bid = max(listing.bids.amount, default=0)
-            if amount > listing.starting_bid and amount > highest_bid:
-                bid = Bid(bidder=request.user, amount=amount, listing=listing)
-                bid.save()
-                return redirect("auctions:listing", listing_id=listing.id)
-            else:
-                messages.error(request, "Bid must be greater than current bid")
-                return redirect("auctions:listing", listing_id=listing.id)
+    if request.method != "POST":
+        return redirect("auctions:listing", listing_id=listing_id)
+
+    bid_form = BidForm(request.POST)
+    if not bid_form.is_valid():
+        return redirect("auctions:listing", listing_id=listing_id)
+
+    listing = get_object_or_404(AuctionListing, id=listing_id)
+    bid_amount = bid_form.cleaned_data["amount"]
+
+    if bid_amount <= listing.starting_bid:
+        messages.error(request, "Bid must be greater than starting bid")
+        return redirect("auctions:listing", listing_id=listing.id)
+
+    highest_bid = listing.bids.order_by('-amount').first()
+    if highest_bid and bid_amount <= highest_bid.amount:
+        messages.error(request, "Bid must be greater than current bid")
+        return redirect("auctions:listing", listing_id=listing.id)
+
+    accepted_bid = Bid(bidder=request.user, amount=bid_amount, listing=listing)
+    accepted_bid.save()
+    return redirect("auctions:listing", listing_id=listing.id)
 
 
 @login_required

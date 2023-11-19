@@ -1,59 +1,98 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
-{% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
-{% endif %}
-<h1>Listing</h1>
-
-{% if listing.active %}
-    <h3>{{ listing.title }}</h3>
-    <p>{{ listing.description }}</p>
-    <p>Starting Bid: {{ listing.starting_bid }}</p>
-    <p>Category: {{ listing.category }}</p>
-    <p><img src="{{ listing.image_url }}" alt="{{ listing.title }}"></p>
-
-    <form action="{% url 'auctions:watchlist' listing.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Add to Watchlist</button>
-    </form>
-
-    <form action="{% url 'auctions:bid' listing.id %}" method="post">
-        {% csrf_token %}
-        {{ bid_form }}
-        <button type="submit">Bid</button>
-    </form>
-
-    <h2>Bids</h2>
-    {% for bid in bids %}
-        <p>{{ bid.amount }}</p>
-    {% endfor %}
-
-    {% if is_creator %}
-        <form action="{% url 'auctions:close_listing' listing.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Close Listing</button>
-        </form>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
+    <h1>Listing</h1>
 
-    <h2>Leave a Comment</h2>
-    <form action="{% url 'auctions:comment' listing.id %}" method="post">
-        {% csrf_token %}
-        {{ comment_form }}
-        <button type="submit">Comment</button>
-    </form>
+    {% if listing.active %}
+        <h3>{{ listing.title }}</h3>
+        <p>{{ listing.description }}</p>
+        <p>Starting Bid: {{ listing.starting_bid }}</p>
+        <p>Category: {{ listing.category }}</p>
+        <p><img src="{{ listing.image_url }}" alt="{{ listing.title }}"></p>
 
-    <h2>Comments</h2>
-    {% for comment in comments %}
-        <p>{{ comment.content }}</p>
-    {% endfor %}
-{% else %}
-    <h2>LISTING CLOSED</h2>
-    <!-- You can add more details about the closed listing here if needed -->
-{% endif %}
+        <form action="{% url 'auctions:watchlist' listing.id %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Add to Watchlist</button>
+        </form>
 
+        <form action="{% url 'auctions:bid' listing.id %}" method="post">
+            {% csrf_token %}
+            {{ bid_form }}
+            <button type="submit">Bid</button>
+        </form>
+
+        <h2>Bids</h2>
+        {% for bid in bids %}
+            <p>{{ bid.amount }}</p>
+        {% endfor %}
+
+        {% if is_creator %}
+            <form action="{% url 'auctions:close_listing' listing.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Close Listing</button>
+            </form>
+        {% endif %}
+
+        <h2>Leave a Comment</h2>
+        <form id="comment-form" action="{% url 'auctions:comment' listing.id %}" method="post">
+            {% csrf_token %}
+            {{ comment_form }}
+            <button type="submit">Comment</button>
+        </form>
+
+        <h2>Comments</h2>
+        <div id="comments"></div>
+
+    {% else %}
+        <h2>LISTING CLOSED</h2>
+        <!-- You can add more details about the closed listing here if needed -->
+    {% endif %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $('#comment-form').on('submit', function (event) {
+            event.preventDefault(); // Prevent form from being submitted the traditional way
+            var form = $(this);
+            var url = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(), // serializes form input
+                success: function (data) {
+                    console.log('comment submission successful!');
+                    // Clear/reset the comment form after successful submission
+                    $('#comment-form')[0].reset();
+                    // Then recreate the get comments AJAX call here to fetch the newly updated comments
+                    getComments();
+                }
+            });
+        });
+
+        function getComments() {
+            $.ajax({
+                url: '/get-comments/' + {{ listing.id }} +'/',
+                method: 'GET',
+                success: function (data) {
+                    console.log(data.comments)
+                    let comments = data.comments;
+                    let commentsDiv = document.getElementById('comments');
+                    commentsDiv.innerHTML = "";
+                    for (let i = 0; i < comments.length; i++) {
+                        let commentDiv = document.createElement('div');
+                        commentDiv.textContent = comments[i].content;
+                        commentsDiv.appendChild(commentDiv);
+                    }
+                }
+            });
+        }
+
+        getComments();
+    </script>
 {% endblock %}
