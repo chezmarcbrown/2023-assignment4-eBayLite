@@ -23,7 +23,7 @@
 <body>
 <header>
     <div class="text-center">
-        <h1>Auctions "R" Us</h1>
+
     </div>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="collapse navbar-collapse" id="navbarNav">
@@ -35,12 +35,18 @@
                         {% endif %}
                     </a>
                 </li>
-                <li class="nav-item {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">
-                    <a class="nav-link" href="{% url 'auctions:categories' %}">Categories
+                <li class="nav-item dropdown {% if request.resolver_match.url_name == 'categories' %}active{% endif %}">
+                    <a class="nav-link dropdown-toggle" href="{% url 'auctions:categories' %}" id="navbarDropdown" role="button" data-toggle="dropdown" aria-expanded="false">
+                        Categories
                         {% if request.resolver_match.url_name == 'categories' %}
                             <span class="sr-only">(current)</span>
                         {% endif %}
                     </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        {% for c in categories %}
+                            <a class="dropdown-item" href="{% url 'auctions:category_listings' c.id %}">{{ c.name }}</a>
+                        {% endfor %}
+                    </div>
                 </li>
                 <li class="nav-item {% if request.resolver_match.url_name == 'watchlist_view' %}active{% endif %}">
                     <a class="nav-link" href="{% url 'auctions:watchlist_view' %}">Watchlist
