@@ -1,20 +1,35 @@
 {% extends "auctions/layout.html" %}
 {% block main %}
-    <h1>Listings in {{ category.name }}</h1>
-    <ul>
-        {% for listing in listings %}
-            <li>
-                {% if listing.id in watchlist_ids %}
-                    <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
-                {% else %}
-                    <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
-                {% endif %}
-                {{ listing.title }} - {{ listing.description }}
-            </li>
-        {% empty %}
-            <li>No listings available in this category.</li>
-        {% endfor %}
-    </ul>
+<div class="container my-4">
+    <h1 class="text-center mb-4">Listings in {{ category.name }}</h1>
+    {% if listings %}
+        <div class="row">
+            {% for listing in listings %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card">
+                        {% if listing.image_url %}
+                            <img src="{{ listing.image_url }}" class="card-img-top" alt="{{ listing.title }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ listing.title }}</h5>
+                            <p class="card-text">{{ listing.description }}</p>
+                            <p class="card-text">Starting Bid: ${{ listing.starting_bid }}</p>
+                            {% if listing.id in watchlist_ids %}
+                            <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+                        {% else %}
+                            <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+                        {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <p>No listings available in this category.</p>
+    {% endif %}
+
+    <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
 
     <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 
@@ -47,4 +62,6 @@
             });
         });
     </script>
+
+</div>
 {% endblock %}

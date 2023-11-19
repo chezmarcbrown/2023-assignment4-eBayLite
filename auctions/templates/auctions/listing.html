@@ -1,6 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
+<div class="container">
     {% if messages %}
         <ul class="messages">
             {% for message in messages %}
@@ -92,4 +93,5 @@
 
         getComments();
     </script>
+</div>
 {% endblock %}

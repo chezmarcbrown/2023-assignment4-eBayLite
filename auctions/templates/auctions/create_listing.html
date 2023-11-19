@@ -1,6 +1,7 @@
 {% extends "auctions/layout.html" %}
 {% block main %}
 {% load crispy_forms_tags %}
+<div class="container">
     <h2>Add a new Auction</h2>
     {% if messages %}
         <ul class="messages">
@@ -23,4 +24,5 @@
         <a href="{% url 'auctions:watchlist_view' %}">Watchlist</a>
         <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
     {% endif %}
+</div>
 {% endblock %}

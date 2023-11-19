@@ -1,6 +1,6 @@
 {% extends "auctions/layout.html" %}
 {% block main %}
-
+<div class="container">
     <h2>Active Listings</h2>
     {% if messages %}
         <ul class="messages">
@@ -34,7 +34,9 @@
                             {% if a.image_url %}
                                 <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
                             {% endif %}
-                            <p>Category: {{ a.category }}</p>
+                            <a href="{% url 'auctions:category_listings' a.category.id %}">
+                                {{ a.category.name }}
+                            </a>
                             {% if a.id in watchlist_ids %}
                                 <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
                             {% else %}
@@ -76,4 +78,5 @@
             });
         });
     </script>
+</div>
 {% endblock %}

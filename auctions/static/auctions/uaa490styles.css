@@ -12,6 +12,12 @@ body {
   grid-template-columns: 10% 80% 10%;
 }
 
+.container {
+  padding: 20px; 
+
+}
+
+
 .restricted-img {
     max-width: 200px;
     max-height: 200px;
@@ -19,4 +25,20 @@ body {
 
 .form-control {
   width: 50%;
+}
+
+
+.remove-text {
+  color: black;
+}
+
+.watchlist-remove-icon:hover {
+  color: red; 
+  transform: scale(1.2); 
+  cursor: pointer;
+}
+
+.watchlist-icon:hover {
+  transform: scale(2); 
+  cursor: pointer;
 }
