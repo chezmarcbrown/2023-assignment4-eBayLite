@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 
+import json
+from django.http import JsonResponse
+
 from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
 
@@ -129,20 +132,25 @@ def create(request):
             "categories": category_list
         })
     
-    
+from django.http import JsonResponse
+
 def add_comment(request, listing_id):
-    item = Listing.objects.get(id=listing_id)
-    comment, created = Comment.objects.get_or_create(author=request.user)
-    comment.save()
+    if request.method == 'POST' and request.is_ajax():
+        item = Listing.objects.get(id=listing_id)
+        comment_text = request.POST.get('comment_input')
 
-    comment_text = request.POST.get('comment_input')
+        if comment_text:
+            comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
+            comment.save()
 
-    if comment_text:
-        comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
-        comment.save()
+            response_data = {
+                'author': comment.author.username,
+                'comment': comment.comment,
+            }
+            return JsonResponse({'post': response_data})
 
-    return HttpResponse(200)    
-    
+    return JsonResponse({'error': 'Bad Request'}, status=400)
+
 
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)

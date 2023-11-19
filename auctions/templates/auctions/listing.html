@@ -36,6 +36,34 @@
         }
 </script>
 
+<script>
+    function add_comment(listingId) {
+        var postBtn = document.getElementById('post');
+        postBtn.addEventListener("click", function() {
+            var commentBoxValue = document.getElementById("comment_input").value;
+
+            if (!document.getElementById("unordered").innerHTML.includes(commentBoxValue)) {
+                var div = document.createElement("div");
+                var commenterName = '{{ user.username }}';
+                div.className = "comment-box";
+
+                var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
+                div.appendChild(text);
+                document.getElementById("unordered").appendChild(div);
+                
+                fetch('../add_comment/' + listingId)
+
+                .then(response => response.json())
+                .then(data => {
+                    document.querySelector('#comment_input').innerHTML = data['post'];
+                })
+            }
+
+        });
+    }
+    
+</script>
+
 <div class="row">
     {% if listing.author == user or user.is_superuser %}
     <div class="close_listing">
@@ -125,13 +153,14 @@
                 </div>
                 {% endfor %}
 
-                <form id="listing_comments_form" onsubmit="add_comment('{{listing.id}}'); return false;">
+                <form id="listing_comments" onsubmit="add_comment('{{ listing.id }}'); return false;">
                     {% csrf_token %}
                     <div class="comment_input">
-                        <textarea id="comment_input" name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                        <button id="post">Post Comment</button>
+                        <textarea id="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+                        <input class="button" id="post" type="submit" value="Post Comment"/>
                     </div>
-                </form>     
+                </form>
+                <div id="comment_details"></div>     
             </div>
         </div>
     </div>
@@ -156,25 +185,5 @@
     </div>
 </div>
 
-<script>
-    function add_comment(listingId) {
-        var postBtn = document.getElementById('post');
-        postBtn.addEventListener("click", function() {
-            var commentBoxValue = document.getElementById("comment_input").value;
-
-            if (!document.getElementById("unordered").innerHTML.includes(commentBoxValue)) {
-                var div = document.createElement("div");
-                var commenterName = '{{ user.username }}';
-
-
-                var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
-                div.appendChild(text);
-                document.getElementById("unordered").appendChild(div);
-                
-                fetch('../add_comment/' + listingId,);
-            }
-        });
-    }
-</script>
 
 {% endblock %}
