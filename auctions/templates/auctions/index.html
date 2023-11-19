@@ -1,31 +1,35 @@
 {% extends "auctions/layout.html" %} {% block main %}
-
-<h2>Active Listings</h2>
-{% if messages %}
-  <ul class="messages">
-      {% for message in messages %}
-          <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-      {% endfor %}
-  </ul>
-{% endif %}
-<article>
-  {% for a in auctions %}
-    {% if a.active == True %}
-    <section>
-        <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{a.id}}: </a></h4>
-        <p>Title: {{ a.title }}</p>
-        <p>Description: {{ a.description }}</p>
-        <p>Starting Bid ${{ a.starting_bid }}</p>
-        <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
-        <p>Category: {{ a.category }}</p>
-        <form action="{% url 'auctions:watchlist' a.id %}" method="post">
-            {% csrf_token %}
-            <button type="submit">Add to Watchlist</button>
-        </form>
-      </section>
+    <h2>Active Listings</h2>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+            {% endfor %}
+        </ul>
     {% endif %}
 
-  {% endfor %}
-</article>
+    <div id="accordion">
+        {% for a in auctions %}
+            {% if a.active %}
+                <h4>{{ a.title }}</h4>
+                <div>
+                    <a href="{% url 'auctions:listing' a.id %}">Details</a>
+                    <p>Description: {{ a.description }}</p>
+                    <p>Starting Bid ${{ a.starting_bid }}</p>
+                    <p><img src="{{ a.image_url }}" alt="{{ a.title }}" class="restricted-img"></p>
+                    <p>Category: {{ a.category }}</p>
+                    <form action="{% url 'auctions:watchlist' a.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Add to Watchlist</button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
 
+    <script>
+        $(function () {
+            $("#accordion").accordion();
+        });
+    </script>
 {% endblock %}

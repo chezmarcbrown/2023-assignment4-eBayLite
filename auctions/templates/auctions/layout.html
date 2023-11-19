@@ -2,22 +2,20 @@
 
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>{% block title %}Auctions{% endblock %}</title>
-    {% comment %} {% load bootstrap5 %}
-    {% bootstrap_css %}
-    {% bootstrap_javascript %}
-    {% bootstrap_messages %} {% endcomment %}
-    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css" />
-    <link rel="stylesheet" href="{% static 'auctions/uaa490styles.css' %}" />
-
-  </head>
-  <body>
-    <header>
-      <h1>Auctions "R" Us</h1>
-      <nav>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css"/>
+    <link rel="stylesheet" href="{% static 'auctions/uaa490styles.css' %}"/>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<body>
+<header>
+    <h1>Auctions "R" Us</h1>
+    <nav>
         <span>
           <a href="{% url 'auctions:index' %}">Active Listings</a>
           <a href="{% url 'auctions:categories' %}">Categories</a>
@@ -27,15 +25,15 @@
         </span>
         <span>
           {% if user.is_authenticated %} Welcome
-          <strong>{{ user.username }}!</strong>
-          <a href="{% url 'auctions:logout' %}">Log Out</a>
+              <strong>{{ user.username }}!</strong>
+              <a href="{% url 'auctions:logout' %}">Log Out</a>
           {% else %}
-          <a href="{% url 'auctions:login' %}">Log In</a>
-          <a href="{% url 'auctions:register' %}">Register</a>
+              <a href="{% url 'auctions:login' %}">Log In</a>
+              <a href="{% url 'auctions:register' %}">Register</a>
           {% endif %}
         </span>
-      </nav>
-    </header>
-    <main>{% block main %} {% endblock %}</main>
-  </body>
+    </nav>
+</header>
+<main>{% block main %} {% endblock %}</main>
+</body>
 </html>
