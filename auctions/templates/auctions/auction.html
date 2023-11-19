@@ -52,18 +52,24 @@
                     <i class="far fa-heart"></i>Not Watchlisted
                 {% endif %}
             </div>
+            <div id="watchlist-image">
+                <img src=""></img><!--Add to Watchlist(empty heart)-->
+            </div>
 
         {% endif %}
+        <div id="comments-container">
             <div>Comments: </div>
             {% for c in comments %}
                 <div>{{c.user.username}} commented: {{c.comment}}</div>
             {% empty %}
                 <div>No Comments Yet</div>
             {% endfor %}
+        </div>
         {% if user.is_authenticated %}
-            <form action="{% url 'auctions:comment' auction.id %}" method="POST">
+            <form id="comment-form" action="{% url 'auctions:comment' auction.id %}" method="POST">
                 {% csrf_token %}
                 {{ commentform.as_p }}
+                <!--<input type="text" id="comment" autofocus placeholder="Comment">-->
                 <br>
                 <input class="btn btn-primary" type="submit" value="Comment">
             </form>

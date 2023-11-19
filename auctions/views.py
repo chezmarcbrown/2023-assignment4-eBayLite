@@ -167,7 +167,11 @@ def comment(request, auction_id):
             text = f.cleaned_data
             comment = Comment(user=request.user,auction=auction, **text)
             comment.save()
-            return HttpResponseRedirect(reverse('auctions:index'))
+            status = {
+                'text': text['comment']
+            }
+            return JsonResponse(status)
+            #return HttpResponseRedirect(reverse('auctions:index'))
 
 @login_required(login_url='auctions/login.html')
 def closebid(request, auction_id):

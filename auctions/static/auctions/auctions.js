@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const listingId = this.dataset.listingId;
 
             // Check if the user is authenticated
-            if (user.is_authenticated){
+            //if (user.is_authenticated){
                 // Toggle the heart icon class
                 //this.classList.toggle('fas');
                 //this.classList.toggle('far');
@@ -25,21 +25,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         watchlistIcon.innerHTML = data.is_watchlisted ? 'Watchlisted' : 'Not Watchlisted';
                     })
                     .catch(error => console.error('Error:', error));
-            }
+            //}
         });
     }
 });
 
 document.addEventListener('DOMContentLoaded', function() {
     const commentForm = document.getElementById('comment-form');
+    console.log(commentForm)
     const commentsContainer = document.getElementById('comments-container');
+    console.log(commentsContainer)
 
     if (commentForm) {
         commentForm.addEventListener('submit', function(event) {
             event.preventDefault(); // Prevent the default form submission
 
+            //const comment = document.querySelector('#comment').value;
+            //console.log(comment)
+
             // Check if the user is authenticated
-            if (user.is_authenticated){
+            //if (user.is_authenticated){
                 const formData = new FormData(commentForm);
 
                 // Send an AJAX request to add a new comment
@@ -50,12 +55,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(response => response.text())
                     .then(data => {
                         // Append the new comment to the comments container
-                        commentsContainer.innerHTML += data;
+                        //commentsContainer.innerHTML += 'You commented: '+comment+'';
+                        var comment = JSON.parse(data)
+                        //comment = data['text']
+                        comment = comment.text
+                        console.log(comment)
+                        commentsContainer.innerHTML += 'You commented: '+comment+'<br>';
                         // Clear the comment form
-                        commentForm.reset();
+                        commentForm.reset();//clear whats written in the text box
                     })
                     .catch(error => console.error('Error:', error));
-            }
+            //}
         });
     }
 });
