@@ -37,25 +37,40 @@
 </script>
 
 <script>
-    function add_comment(listingId) {
+    document.addEventListener("DOMContentLoaded", function() {
         var postBtn = document.getElementById('post');
-        fetch('../add_comment/' + listingId);
-
         postBtn.addEventListener("click", function() {
-            var commentBoxValue = document.getElementById("comment_input").value;
-
-            if (!document.getElementById("unordered").innerHTML.includes(commentBoxValue)) {
-                var div = document.createElement("div");
-                var commenterName = '{{ user.username }}';
-                div.className = "comment-box";
-
-                var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
-                div.appendChild(text);
-                document.getElementById("unordered").appendChild(div);
-                
-            }
+            add_comment('{{listing.id}}');
         });
+    });
+
+    function add_comment(listingId) {
+        var commentBoxValue = document.getElementById("comment_input").value;
+
+        if (!document.getElementById("comment_row").innerHTML.includes(commentBoxValue)) {
+            var commentDiv = document.createElement("div");
+            var commenterName = '{{ user.username }}';
+            commentDiv.className = "col-2 card-gray p-25";
+            
+
+            var rowDiv = document.createElement("div");
+            rowDiv.className = "row center";
+
+            var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
+            commentDiv.appendChild(text);
+            rowDiv.appendChild(commentDiv);
+            document.getElementById("comment_list").appendChild(rowDiv);
+
+            save_new_comment(commentBoxValue, commenterName, listingId);
+
+            document.getElementById("comment_input").value = null;
+        }
     }
+    
+    function save_new_comment(comment, commenter, listingId) {
+        fetch('../add_comment/' + listingId);
+    }    
+
 </script>
 
 <div class="row">
@@ -131,31 +146,31 @@
     <div class="col-2">
         <h4>Comments</h4>
         <div class="card-gray">
-            <div id="unordered">
+            <div id="comment_list">
                 {% for comment in comments %}
-                <div class="row center">
+                <div id="comment_row" class="row center">
                     <div class="col-2 card-gray p-25">
                         {{comment.author}} commented: {{comment.comment}}
                     </div>
+                    {% if user.is_superuser %}
                     <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
                         <div>
-                            {% if user.is_superuser %}
                             <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
-                            {% endif %}
                         </div>
                     </form>
+                    {% endif %}
                 </div>
                 {% endfor %}
 
-                <form id="listing_comments" onsubmit="add_comment('{{ listing.id }}'); return false;">
-                    {% csrf_token %}
-                    <div class="comment_input">
-                        <textarea id="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                        <input class="button" id="post" type="submit" value="Post Comment"/>
-                    </div>
-                </form>
                 <div id="comment_details"></div>     
             </div>
+            <form id="listing_comments" onsubmit="add_comment('{{ listing.id }}'); return false;">
+                {% csrf_token %}
+                <div class="comment_input">
+                    <textarea id="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+                    <input class="button" id="post" type="submit" value="Post Comment"/>
+                </div>
+            </form>
         </div>
     </div>
     <div class="col-2">
