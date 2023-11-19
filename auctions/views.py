@@ -7,6 +7,7 @@ from .models import Auction, User, Bid, Comment
 from .forms import AuctionForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
+from django.http import JsonResponse
 
 
 
@@ -177,5 +178,18 @@ def closebid(request, auction_id):
     auction.save()# save to the database
     return HttpResponseRedirect(reverse('auctions:index'))
 
-def api_status(request):
-    pass
+def toggle_watchlist(request, auction_id):
+    if request.method == 'POST' and request.user.is_authenticated:
+        listing = get_object_or_404(Auction, pk=auction_id)
+        user = request.user
+
+        if listing in user.watchlist.auctions.all():
+            user.watchlist.auctions.remove(listing)
+            is_watchlisted = False
+        else:
+            user.watchlist.auctions.add(listing)
+            is_watchlisted = True
+
+        return JsonResponse({'is_watchlisted': is_watchlisted})
+
+    return JsonResponse({'error': 'Invalid request'})
