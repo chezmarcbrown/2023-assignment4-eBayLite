@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Auctions.js loaded successfully!'); // to debug
     const watchlistIcon = document.getElementById('watchlist-icon');
-    console.log(watchlistIcon)
+    //console.log(watchlistIcon)
 
     if (watchlistIcon) {
         watchlistIcon.addEventListener('click', function() {
@@ -73,25 +73,44 @@ document.addEventListener('DOMContentLoaded', function() {
     const header = document.getElementById('watchlist-image')
     //console.log(header)
     const add = document.getElementById('wishlist')
-    //console.log(add)
+    console.log(add)
+    const remove = document.getElementById('watchlist')
+    console.log(remove)
+    //const header2 = document.getElementById("watchlist-img")
+    //const add2 = document.getElementById('watchlist')
+    //console.log(add.href)
     //const listingId = this.dataset.listingId
     //console.log(listingId)
 
     header.addEventListener('click', function(event) {
         event.preventDefault(); // some reason this stops from executing on refresh aswell
-        const listingId = this.dataset//get the listing id
-        console.log(listingId)
-        const number = 23;//testing on minecraft listing temp
-        console.log(number)
+        //const listingId = this.dataset//get the listing id
+        const listingId = header.innerHTML.href;
+        //console.log(listingId)
+        //const number = 23;//testing on minecraft listing temp
+        //console.log(number)
         console.log(header.innerHTML)
+        //console.log(header2.innerHTML)
         if (document.querySelector('#foo').src === "https://cdn-icons-png.flaticon.com/512/73/73814.png") {
             document.querySelector('#foo').src = "https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png"
             //call add to watchlist function
-            fetch('addwishlist/'+number+'/')//page not found
+            //fetch(`addwishlist/${listingId}/`)//page not found
+            fetch(add.href)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data)
+            })
         }
         else {
             document.querySelector('#foo').src = "https://cdn-icons-png.flaticon.com/512/73/73814.png"
             //call remove from watchlist function
+            
+            console.log(remove.href)
+            fetch(remove.href)
+            .then(response => response.text())
+            .then(data => {
+                console.log(data)
+            })
         }
     });
 });

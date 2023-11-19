@@ -39,7 +39,7 @@
 
             
 
-            <a id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}" hidden>Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
+            <a id="d" href="{% url 'auctions:addwishlist' auction.id %}" hidden>Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
             {% if user == auction.user %}<!--fix this-->
                 <a href="{% url 'auctions:closebid' auction.id %}">Close Bidding</a>
             {% endif %}
@@ -54,7 +54,7 @@
             -->
             {% if auction in user.wishlist.all %}<!--doesnt work-->
                 <div id="watchlist-image" dataset="{{ auction.id }}">
-                    <a dataset="{{ auction.id }}" id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}"><img id="foo" src='https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png'></a>
+                    <a dataset="{{ auction.id }}" id="watchlist" href="{% url 'auctions:removewishlist' auction.id %}"><img id="foo" src='https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png'></a>
                 </div>
             {% else %}
                 <div id="watchlist-image" dataset="{{ auction.id }}">
