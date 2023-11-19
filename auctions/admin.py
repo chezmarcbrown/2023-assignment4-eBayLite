@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import AuctionListing, Bid, Comment, User
+from .models import AuctionListing, Bid, Category, Comment, User, Watchlist
 
 admin.site.register(AuctionListing)
 
@@ -14,3 +14,8 @@ admin.site.register(Comment)
 
 
 admin.site.register(User)
+
+admin.site.register(Watchlist)
+
+admin.site.register(Category)
+
