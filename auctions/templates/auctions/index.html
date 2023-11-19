@@ -46,5 +46,29 @@
         }
     </script>
 
+    <script>
+        function add_comment(listingId) {
+            
+            var postBtn = document.getElementById('post');
+            fetch('../add_comment/' + postBtn.dataset.listingId);
+
+            postBtn.addEventListener("click", function() {
+                var commentBoxValue = document.getElementById("comment_input").value;
+
+                if (!document.getElementById("unordered").innerHTML.includes(commentBoxValue)) {
+                    var div = document.createElement("div");
+                    var commenterName = '{{ user.username }}';
+                    div.className = "comment-box";
+
+                    var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
+                    div.appendChild(text);
+                    document.getElementById("unordered").appendChild(div);
+                    
+                }
+            });
+        }
+        
+    </script>
+
 </article>
 {% endblock %}

@@ -39,6 +39,8 @@
 <script>
     function add_comment(listingId) {
         var postBtn = document.getElementById('post');
+        fetch('../add_comment/' + listingId);
+
         postBtn.addEventListener("click", function() {
             var commentBoxValue = document.getElementById("comment_input").value;
 
@@ -51,17 +53,9 @@
                 div.appendChild(text);
                 document.getElementById("unordered").appendChild(div);
                 
-                fetch('../add_comment/' + listingId)
-
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelector('#comment_input').innerHTML = data['post'];
-                })
             }
-
         });
     }
-    
 </script>
 
 <div class="row">
