@@ -65,12 +65,14 @@
                                     {% endif %}
                                     <span class="text-muted">Created at: {{ item.created_at }} </span>
 
-                                    {% if item in user.watchlist.all %}
-                                        <a class="text-danger" href="{% url 'unwatch' item.id %}"><i
-                                                class="fa fa-heart"></i></a>
-                                    {% else %}
-                                        <a class="text-danger" href="{% url 'watch' item.id %}"><i
-                                                class="far fa-heart"></i></a>
+                                    {% if user.is_authenticated %}
+                                        {% if item in user.watchlist.all %}
+                                            <a href="#" class="watchlist-toggle text-danger" data-id="{{ item.id }}" data-action="unwatch" data-url="{% url 'unwatch' item.id %}"><i
+                                                    class="fa fa-heart"></i></a>
+                                        {% else %}
+                                            <a href="#" class="watchlist-toggle text-danger" data-id="{{ item.id }}" data-action="watch" data-url="{% url 'watch' item.id %}"><i
+                                                    class="far fa-heart"></i></a>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                             </div>

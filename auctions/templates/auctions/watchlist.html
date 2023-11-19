@@ -3,7 +3,7 @@
 {% block body %}
     <h2>Watchlist</h2>
     {% for item in watchlist %}
-        <div class="container pb-5 mt-n2 mt-md-n3">
+        <div class="container pb-5 mt-n2 mt-md-n3 item-container">
             <div class="row">
                 <div class="col-xl-9 col-md-8">
                     <!-- Item-->
@@ -44,8 +44,9 @@
                                 {% endif %}
                                 <span class="text-muted">Created {{ item.created_at }} </span>
 
-                                <a class="text-danger" href="{% url 'unwatch' item.id %}"><i
-                                        class="fa fa-heart"></i></a>
+                                <a class="text-danger watchlist-toggle" href="#" data-id="{{ item.id }}" data-action="unwatch" data-url="{% url 'unwatch' item.id %}">
+                                    <i class="fa fa-heart"></i>
+                                </a>
                             </div>
                         </div>
                     </div>

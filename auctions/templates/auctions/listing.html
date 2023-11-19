@@ -1,7 +1,7 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <div class="container col-md-12">
+    <div class="container col-md-12 item-container">
         <div class="pl-4 pt-3">
             {% if auction.winner is not None %}
                 {% if user == bid.user %}

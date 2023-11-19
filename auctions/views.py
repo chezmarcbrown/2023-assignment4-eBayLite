@@ -2,18 +2,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-
 from .models import User, AuctionListing, Bid, Comment, Category
 from .forms import AuctionListingForm, CommentForm
 
-
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": AuctionListing.objects.all().order_by('-created_at')
+        "listings": AuctionListing.objects.all().order_by('-created_at'),
     })
+
 
 
 def login_view(request):
@@ -69,14 +68,14 @@ def register(request):
 
 
 # ======================================================================================================================
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def create(request):
     return render(request, "auctions/create.html", {
         'form': AuctionListingForm()
     })
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def insert(request):
     if request.method == 'POST':
         form = AuctionListingForm(request.POST, request.FILES)
@@ -116,7 +115,7 @@ def listing(request, id):
     })
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def update_bid(request, id):
     amount = request.POST['bid']
     if amount:
@@ -135,7 +134,7 @@ def update_bid(request, id):
         raise ValidationError('Bid must be greater than current Bid value')
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def close_bid(request, id):
     auction = get_object_or_404(AuctionListing, id=id)
     auction.active, auction.winner = False, request.user.username
@@ -143,31 +142,34 @@ def close_bid(request, id):
     return HttpResponseRedirect(reverse('index'))
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def watchlist(request):
     return render(request, "auctions/watchlist.html", {
         "watchlist": request.user.watchlist.all()
     })
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def watch(request, id):
-    auction = get_object_or_404(AuctionListing, id=id)
-    request.user.watchlist.add(auction)
-    request.user.watchlist_counter += 1
-    request.user.save()
-    return HttpResponseRedirect(reverse('index'))
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        auction = get_object_or_404(AuctionListing, id=id)
+        request.user.watchlist.add(auction)
+        #request.user.watchlist_counter += 1
+        #request.user.save()
+        return JsonResponse({"success": True, "watchlist_count": request.user.watchlist.count()})
+    #return HttpResponseRedirect(reverse('index'))
 
 
-@login_required(login_url='auctions/login.html')
+@login_required(login_url='login')
 def unwatch(request, id):
-    auction = get_object_or_404(AuctionListing, id=id)
-    request.user.watchlist.remove(auction)
-    request.user.watchlist_counter -= 1
-    request.user.save()
-    if '/unwatch/' in request.path:
-        return HttpResponseRedirect(reverse('index'))
-    return HttpResponseRedirect(reverse('wishlist'))
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        auction = get_object_or_404(AuctionListing, id=id)
+        request.user.watchlist.remove(auction)
+        #request.user.watchlist_counter -= 1
+        #request.user.save()
+        return JsonResponse({"success": True, "watchlist_count": request.user.watchlist.count()})
+    
+    #return HttpResponseRedirect(reverse('wishlist'))
 
 
 def categories(request):
