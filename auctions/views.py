@@ -16,6 +16,7 @@ from django.forms import model_to_dict
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
+from django.db.models import F
 from .models import User, AuctionListing, Category, Bid, Comment, Watchlist
 from .forms import AuctionForm, BidForm, CommentForm
 from django.contrib import messages
@@ -134,29 +135,40 @@ def comment(request, listing_id):
             return JsonResponse({'status':'success'})
 
 
+def get_bids_data(listing_id):
+    bid_queryset = Bid.objects.filter(listing=listing_id).order_by("-amount")
+    return [model_to_dict(bid) for bid in bid_queryset]
+
+
+def getBids(request, listing_id):
+    response = {
+        'bids': get_bids_data(listing_id)
+    }
+    return JsonResponse(response)
+
 def bid(request, listing_id):
     if request.method != "POST":
-        return redirect("auctions:listing", listing_id=listing_id)
+        return JsonResponse({'status':'failed'})
 
     bid_form = BidForm(request.POST)
     if not bid_form.is_valid():
-        return redirect("auctions:listing", listing_id=listing_id)
+        return JsonResponse({'status':'failed'})
 
     listing = get_object_or_404(AuctionListing, id=listing_id)
     bid_amount = bid_form.cleaned_data["amount"]
 
     if bid_amount <= listing.starting_bid:
         messages.error(request, "Bid must be greater than starting bid")
-        return redirect("auctions:listing", listing_id=listing.id)
+        return JsonResponse({'status':'failed'})
 
     highest_bid = listing.bids.order_by('-amount').first()
     if highest_bid and bid_amount <= highest_bid.amount:
         messages.error(request, "Bid must be greater than current bid")
-        return redirect("auctions:listing", listing_id=listing.id)
+        return JsonResponse({'status':'failed'})
 
     accepted_bid = Bid(bidder=request.user, amount=bid_amount, listing=listing)
     accepted_bid.save()
-    return redirect("auctions:listing", listing_id=listing.id)
+    return JsonResponse({'status':'success'})
 
 
 @login_required

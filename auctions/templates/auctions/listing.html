@@ -3,64 +3,100 @@
 {% block title %}Auction - {{ listing.title }}{% endblock %}
 
 {% block main %}
-<div class="container">
-    {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-
-    <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
-
-    {% if listing.active %}
-        <h2>{{ listing.title }}</h2>
-        <p>{{ listing.description }}</p>
-        <p>Starting Bid: {{ listing.starting_bid }}</p>
-        <p>Category: {{ listing.category }}</p>
-        {% if listing.id in watchlist_ids %}
-            <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
-        {% else %}
-            <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+    {% load crispy_forms_tags %}
+    <div class="container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
-        <p><img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="detail-img"></p>
+
+        <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        {% if listing.active %}
+            <h1>{{ listing.title }}</h1>
+            <p>{{ listing.description }}</p>
+            <p>Starting Bid: {{ listing.starting_bid }}</p>
+            <p>Category: {{ listing.category }}</p>
+            {% if listing.id in watchlist_ids %}
+                <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+            {% else %}
+                <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+            {% endif %}
+            <p><img src="{{ listing.image_url }}" alt="{{ listing.title }}" class="detail-img"></p>
 
 
 
-        <form action="{% url 'auctions:bid' listing.id %}" method="post">
-            {% csrf_token %}
-            {{ bid_form }}
-            <button type="submit">Bid</button>
-        </form>
-
-        <h2>Bids</h2>
-        {% for bid in bids %}
-            <p>{{ bid.amount }}</p>
-        {% endfor %}
-
-        {% if is_creator %}
-            <form action="{% url 'auctions:close_listing' listing.id %}" method="post">
+            <form id="bid-form" action="{% url 'auctions:bid' listing.id %}" method="post">
                 {% csrf_token %}
-                <button type="submit">Close Listing</button>
+                {{ bid_form|crispy }}
+                <button type="submit" class="btn btn-success">Bid</button>
             </form>
+
+            <h2>Bids</h2>
+            <div id="bids"></div>
+
+            {% if is_creator %}
+                <form action="{% url 'auctions:close_listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Close Listing</button>
+                </form>
+            {% endif %}
+
+            <h2>Leave a Comment</h2>
+            <form id="comment-form" action="{% url 'auctions:comment' listing.id %}" method="post">
+                {% csrf_token %}
+                {{ comment_form|crispy }}
+                <button type="submit" class="btn btn-primary">Comment</button>
+            </form>
+
+            <h2>Comments</h2>
+            <div id="comments"></div>
+
+        {% else %}
+            <h2>LISTING CLOSED</h2>
+            <!-- You can add more details about the closed listing here if needed -->
         {% endif %}
-
-        <h2>Leave a Comment</h2>
-        <form id="comment-form" action="{% url 'auctions:comment' listing.id %}" method="post">
-            {% csrf_token %}
-            {{ comment_form }}
-            <button type="submit">Comment</button>
-        </form>
-
-        <h2>Comments</h2>
-        <div id="comments"></div>
-
-    {% else %}
-        <h2>LISTING CLOSED</h2>
-        <!-- You can add more details about the closed listing here if needed -->
-    {% endif %}
+    </div>
     <script>
+        $('#bid-form').on('submit', function (event) {
+            event.preventDefault(); // Prevent form from being submitted the traditional way
+            var form = $(this);
+            var url = form.attr('action');
+
+            $.ajax({
+                type: "POST",
+                url: url,
+                data: form.serialize(), // serializes form input
+                success: function (data) {
+                    // Clear/reset the comment form after successful submission
+                    $('#bid-form')[0].reset();
+                    // Then recreate the get comments AJAX call here to fetch the newly updated comments
+                    getBids();
+                }
+            });
+        });
+
+        function getBids() {
+            $.ajax({
+                url: '/get-bids/' + {{ listing.id }} +'/',
+                method: 'GET',
+                success: function (data) {
+                    let bids = data.bids;
+                    let bidsDiv = document.getElementById('bids');
+                    bidsDiv.innerHTML = "";
+                    for (let i = 0; i < bids.length; i++) {
+                        let bidDiv = document.createElement('div');
+                        console.log(bids[i]);
+                        bidDiv.textContent = `${bids[i].amount} - ${bids[i].bidder}`;
+                        bidsDiv.appendChild(bidDiv);
+                    }
+                }
+            });
+        }
+
         $('#comment-form').on('submit', function (event) {
             event.preventDefault(); // Prevent form from being submitted the traditional way
             var form = $(this);
@@ -96,7 +132,7 @@
             });
         }
 
+        getBids();
         getComments();
     </script>
-</div>
 {% endblock %}
