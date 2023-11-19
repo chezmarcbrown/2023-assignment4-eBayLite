@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('Auctions.js loaded successfully!');
+    console.log('Auctions.js loaded successfully!'); // to debug
     const watchlistIcon = document.getElementById('watchlist-icon');
 
     if (watchlistIcon) {
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     .then(data => {
                         // Update the icon state
                         watchlistIcon.className = data.is_watchlisted ? 'on' : 'off';
+                        watchlistIcon.innerHTML = data.is_watchlisted ? 'Watchlisted' : 'Not Watchlisted';
                     })
                     .catch(error => console.error('Error:', error));
             }
