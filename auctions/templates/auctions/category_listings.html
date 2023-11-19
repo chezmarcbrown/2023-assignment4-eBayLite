@@ -3,9 +3,52 @@
 <h1>Listings in {{ category.name }}</h1>
 <ul>
     {% for listing in listings %}
-    <li>{{ listing.title }} - {{ listing.description }}</li>
-    {% empty %}
+    <li>
+        {% if listing.id in watchlist_ids %}
+            <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+        {% else %}
+            <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ listing.id }}"></i>
+        {% endif %}
+        {{ listing.title }} - {{ listing.description }}
+    </li>
+{% empty %}
     <li>No listings available in this category.</li>
-    {% endfor %}
+{% endfor %}
+
 </ul>
+
+<input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+  $(document).ready(function() {
+    var csrfToken = $('#csrfToken').val(); 
+
+    $('.watchlist-icon').click(function() {
+        console.log("Icon clicked, auction ID: ", $(this).data('listing-id'));
+        var auctionId = $(this).data('listing-id');
+        var icon = $(this); 
+
+        $.ajax({
+            url: '/watchlist/' + auctionId + '/', 
+            method: 'POST',
+            data: {
+                csrfmiddlewaretoken: csrfToken
+            },
+            success: function(response) {
+                if (response.added) {
+                    icon.removeClass('fa-regular').addClass('fa-solid');
+                } else {
+                    icon.removeClass('fa-solid').addClass('fa-regular');
+                }
+            },
+            error: function() {
+                console.error('Error toggling watchlist item.');
+            }
+        });
+    });
+});
+
+</script>
 {% endblock %}

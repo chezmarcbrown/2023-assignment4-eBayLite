@@ -16,16 +16,15 @@
     {% for a in auctions %}
         {% if a.active %}
             <section>
-                <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{ a.id }}: </a></h4>
-                <p>Title: {{ a.title }}</p>
+                <h4><a href="{% url 'auctions:listing' a.id %}">Auction {{ a.title }}: </a></h4>
                 <p>Description: {{ a.description }}</p>
                 <p>Starting Bid ${{ a.starting_bid }}</p>
                 <p>Image: {{ a.image_url }}</p>
                 <p>Category: {{ a.category }}</p>
                 {% if a.id in watchlist_ids %}
-                    <i class="fa-soild fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                  <i class="fa-solid fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
                 {% else %}
-                    <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
+                  <i class="fa-regular fa-heart watchlist-icon" data-listing-id="{{ a.id }}"></i>
                 {% endif %}
             </section>
         {% endif %}

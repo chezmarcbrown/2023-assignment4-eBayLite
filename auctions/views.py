@@ -23,9 +23,12 @@ from django.views.decorators.http import require_http_methods
 
 
 def index(request):
-    # show all active listings
     auctions = AuctionListing.objects.filter(active=True)
-    return render(request, "auctions/index.html", {"auctions": auctions})
+    watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
+    return render(request, "auctions/index.html", {
+        "auctions": auctions,
+        "watchlist_ids": watchlist_ids
+    })
 
 
 def login_view(request):
@@ -193,23 +196,30 @@ def watchlist_view(request):
 
 @login_required
 def remove_from_watchlist(request, auction_id):
+    watchlist_items = Watchlist.objects.filter(user=request.user)
     if request.method == "POST":
         try:
             auction = AuctionListing.objects.get(id=auction_id)
         except AuctionListing.DoesNotExist:
             return JsonResponse({"error": "Auction does not exist"}, status=400)
-
-        request.user.watchlist.remove(auction)
-        return JsonResponse({"success": "Removed from watchlist"}, status=200)
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        watchlist_item.delete()
+        return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
     
 
 def category_listings(request, category_id):
-    category = Category.objects.get(id=category_id)
+    category = get_object_or_404(Category, id=category_id)
     listings = AuctionListing.objects.filter(category=category, active=True)
-    return render(request, "auctions/category_listings.html", {"category": category, "listings": listings})
-
+    
+    watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('auction_listing_id', flat=True)
+    
+    return render(request, "auctions/category_listings.html", {
+        "category": category,
+        "listings": listings,
+        "watchlist_ids": watchlist_ids
+    })
 
 def category(request):
     categories = Category.objects.all()
