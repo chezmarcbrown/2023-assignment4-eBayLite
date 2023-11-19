@@ -54,7 +54,6 @@
         <h2>LISTING CLOSED</h2>
         <!-- You can add more details about the closed listing here if needed -->
     {% endif %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
         $('#comment-form').on('submit', function (event) {
             event.preventDefault(); // Prevent form from being submitted the traditional way
@@ -66,7 +65,6 @@
                 url: url,
                 data: form.serialize(), // serializes form input
                 success: function (data) {
-                    console.log('comment submission successful!');
                     // Clear/reset the comment form after successful submission
                     $('#comment-form')[0].reset();
                     // Then recreate the get comments AJAX call here to fetch the newly updated comments
@@ -80,7 +78,6 @@
                 url: '/get-comments/' + {{ listing.id }} +'/',
                 method: 'GET',
                 success: function (data) {
-                    console.log(data.comments)
                     let comments = data.comments;
                     let commentsDiv = document.getElementById('comments');
                     commentsDiv.innerHTML = "";

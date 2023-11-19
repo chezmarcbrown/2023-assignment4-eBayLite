@@ -1,14 +1,14 @@
 {% extends "auctions/layout.html" %}
 {% block main %}
-<h1>Categories</h1>
-<ul>
-  {% for c in categories %}
-  <li>
-    <a href="{% url 'auctions:category_listings' c.id %}">{{ c.name }}</a>
-    {% if c.image %}
-      <img src="{{ c.image.url }}" alt="{{ c.name }}" height="50">
-    {% endif %}
-  </li>
-  {% endfor %}
-</ul>
+    <h1>Categories</h1>
+    <ul>
+        {% for c in categories %}
+            <li>
+                <a href="{% url 'auctions:category_listings' c.id %}">{{ c.name }}</a>
+                {% if c.image %}
+                    <img src="{{ c.image.url }}" alt="{{ c.name }}" height="50">
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
 {% endblock %}
