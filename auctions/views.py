@@ -6,8 +6,8 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 
-import json
-from django.http import JsonResponse
+#import json
+#from django.http import JsonResponse
 
 from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
