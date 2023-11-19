@@ -1,25 +1,46 @@
 {% extends "auctions/layout.html" %}
 
 {% block main %}
-{% if user.is_authenticated %}
-    <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
-    <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
-{% endif %}
 
 <h1>Watchlist</h1>
+<input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 {% for i in watchlist_items %}
-    <h3>{{ i.title }}</h3>
-    <p>{{ i.category }}</p>
-    <p>{{ i.image }}</p>
-    {% if i.active == True %}
-        <p>Active</p>
-    {% else %}
-        <p>Not Active</p>
-    {% endif %}
-    <form action="{% url 'auctions:remove_from_watchlist' i.id %}" method="post">
-        {% csrf_token %}
-        <button type="submit">Remove</button>
-    </form>
+    <section id="watchlist-item-{{ i.auction_listing.id }}">
+        <h3>{{ i.auction_listing.title }}</h3>
+        <p>{{ i.auction_listing.category }}</p>
+        <p>{{ i.auction_listing.image }}</p>
+        <p>{% if i.auction_listing.active %} Active {% else %} Not Active {% endif %}</p>
+
+        <!-- Solid heart icon -->
+        <i class="fa-solid fa-heart watchlist-remove-icon" 
+           data-listing-id="{{ i.auction_listing.id }}"></i>
+    </section>
 {% endfor %}
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('.watchlist-remove-icon').click(function() {
+            var auctionId = $(this).data('listing-id');
+            var icon = $(this); // Cache the icon element for use in the callback
+    
+            // AJAX call to remove item from watchlist
+            $.ajax({
+                url: '/remove_from_watchlist/' + auctionId + '/',
+                method: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('#csrfToken').val()
+                },
+                success: function(response) {
+                    // Remove the section containing the watchlist item
+                    $('#watchlist-item-' + auctionId).remove();
+                },
+                error: function() {
+                    console.error('Error removing item from watchlist.');
+                }
+            });
+        });
+    });
+</script>    
 
 {% endblock %}

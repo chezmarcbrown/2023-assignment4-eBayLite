@@ -10,6 +10,7 @@
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     {% bootstrap_messages %} {% endcomment %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdn.simplecss.org/simple.css" />
     <link rel="stylesheet" href="{% static 'auctions/uaa490styles.css' %}" />
 
@@ -22,7 +23,7 @@
           <a href="{% url 'auctions:index' %}">Active Listings</a>
           <a href="{% url 'auctions:categories' %}">Categories</a>
 
-          <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
+          <a href="{% url 'auctions:watchlist_view' %}">Watchlist</a>
           <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
         </span>
         <span>

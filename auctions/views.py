@@ -16,15 +16,20 @@ from django.forms import model_to_dict
 from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .models import User, AuctionListing, Category, Bid, Comment
+from .models import User, AuctionListing, Category, Bid, Comment, Watchlist
 from .forms import AuctionForm, BidForm, CommentForm
 from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 
 def index(request):
-    # show all active listings
     auctions = AuctionListing.objects.filter(active=True)
-    return render(request, "auctions/index.html", {"auctions": auctions})
+    watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
+    return render(request, "auctions/index.html", {
+        "auctions": auctions,
+        "watchlist_ids": watchlist_ids
+    })
 
 
 def login_view(request):
@@ -183,44 +188,60 @@ def create_listing(request):
         "auctions/create_listing.html",
         {"auction_form": auction_form, "auctions": auctions},
     )
-
-
+    
+    
+@login_required
 def watchlist(request, auction_id):
-    if not request.user.is_authenticated:
-        return redirect("auctions:login")
-    try:
-        auction = AuctionListing.objects.get(id=auction_id)
-    except AuctionListing.DoesNotExist:
-        raise Http404("Auction does not exist")
-    # adds to users watchlist
-    request.user.watchlist.add(auction)
-    watchlist_items = request.user.watchlist.all()
-    return render(
-        request, "auctions/watchlist.html", {"watchlist_items": watchlist_items}
-    )
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
+       
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        if not created:  
+            watchlist_item.delete()
+            added = False
+        else:
+            added = True
+
+        return JsonResponse({"success": "Watchlist updated", "added": added}, status=200)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
 def watchlist_view(request):
-    watchlist_items = request.user.watchlist.all()
+    watchlist_items = Watchlist.objects.filter(user=request.user)
     return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
 
+@login_required
 def remove_from_watchlist(request, auction_id):
-    auction = AuctionListing.objects.get(id=auction_id)
-    # removes from users watchlist
-    request.user.watchlist.remove(auction)
-    watchlist_items = request.user.watchlist.all()
-    return render(
-        request, "auctions/watchlist.html", {"watchlist_items": watchlist_items}
-    )
+    watchlist_items = Watchlist.objects.filter(user=request.user)
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        watchlist_item.delete()
+        return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
+    return JsonResponse({"error": "Invalid request"}, status=400)
+    
 
 def category_listings(request, category_id):
-    category = Category.objects.get(id=category_id)
+    category = get_object_or_404(Category, id=category_id)
     listings = AuctionListing.objects.filter(category=category, active=True)
-    return render(request, "auctions/category_listings.html", {"category": category, "listings": listings})
-
+    
+    watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('auction_listing_id', flat=True)
+    
+    return render(request, "auctions/category_listings.html", {
+        "category": category,
+        "listings": listings,
+        "watchlist_ids": watchlist_ids
+    })
 
 def category(request):
     categories = Category.objects.all()
