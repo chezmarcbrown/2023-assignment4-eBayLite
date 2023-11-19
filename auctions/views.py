@@ -130,13 +130,21 @@ def addwishlist(request, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     request.user.wishlist.add(auction)# adds to the wishlist stored in User
     request.user.save()# saves to database
-    return HttpResponseRedirect(reverse("auctions:wishlist"))
+    status = {
+        'id': auction_id
+    }
+    return JsonResponse(status)
+    #return HttpResponseRedirect(reverse("auctions:wishlist"))
 
 @login_required(login_url='auctions/login.html')
 def removewishlist(request, auction_id):
     auction = get_object_or_404(Auction, id=auction_id)
     request.user.wishlist.remove(auction)
     request.user.save()
+    #status = {
+        #'id': auction_id
+    #}
+    #return JsonResponse(status)
     return HttpResponseRedirect(reverse("auctions:wishlist"))
 
 @login_required(login_url='auctions/login.html')

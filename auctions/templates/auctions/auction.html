@@ -39,22 +39,28 @@
 
             
 
-            <a id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}">Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
+            <a id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}" hidden>Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
             {% if user == auction.user %}<!--fix this-->
                 <a href="{% url 'auctions:closebid' auction.id %}">Close Bidding</a>
             {% endif %}
-
+            <!--
             <div id="watchlist-icon" data-listing-id="{{ auction.id }}" class="{% if auction_in_watchlist %} on {% else %} off {% endif %}">
-                <!-- maybe use different icons for on and off states -->
                 {% if auction_in_watchlist %}
                     <i class="fas fa-heart"></i>Watchlisted
                 {% else %} 
                     <i class="far fa-heart"></i>Not Watchlisted
                 {% endif %}
             </div>
-            <div id="watchlist-image">
-                <img src=""></img><!--Add to Watchlist(empty heart)-->
-            </div>
+            -->
+            {% if auction in user.wishlist %}<!--doesnt work-->
+                <div id="watchlist-image" dataset="{{ auction.id }}">
+                    <a dataset="{{ auction.id }}" id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}"><img id="foo" src='https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png'></a>
+                </div>
+            {% else %}
+                <div id="watchlist-image" dataset="{{ auction.id }}">
+                    <a dataset="{{ auction.id }}" id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}"><img id="foo" src='https://cdn-icons-png.flaticon.com/512/73/73814.png'></a>
+                </div>
+            {% endif %}
 
         {% endif %}
         <div id="comments-container">
