@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // Check if the user is authenticated
             if (user.is_authenticated){
                 // Send an AJAX request to toggle watchlist status
-                fetch(`/toggle_watchlist/${listingId}/`)
+                //fetch(`/toggle_watchlist/${listingId}/`) // this one is using previous 'toggle_watchlist' view
+                fetch("api/status")
                     .then(response => response.json())
                     .then(data => {
                         // Update the icon state
