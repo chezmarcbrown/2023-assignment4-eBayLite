@@ -9,7 +9,7 @@
             <div>Title: {{auction.title}} Won by {{bid.user.username}}</div>
             <div>Description: {{ auction.description }}</div>
             <div>Category: {{auction.category}}</div>    
-            <div><img src="{{ auction.image_url }}" width="200px"></div>
+            <div><img src="{{ auction.image_url }}" width="200px" data-lightbox="image-1" data-title="My caption"></div>
             <div>Price: {{auction.price}}$</div>
                 <div>Comments: </div>
                 {% for c in comments %}
@@ -23,7 +23,7 @@
         <div>Title: {{auction.title}}</div>
         <div>Description: {{ auction.description }}</div>
         <div>Category: {{auction.category}}</div>    
-        <div><img src="{{ auction.image_url }}" width="200px"></div>
+        <div><img src="{{ auction.image_url }}" width="200px" data-lightbox="image-1" data-title="My caption"></div>
         {% if bid.user == auction.user %}
         <div>Current Price: {{auction.price}}$</div>
         {% else %}

@@ -27,3 +27,10 @@ a {
 img {
   width: 50px;
 }
+
+#webtitle  {
+  color: aliceblue;
+}
+.welcome {
+  color: white;
+}
