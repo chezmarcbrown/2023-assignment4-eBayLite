@@ -63,14 +63,27 @@
             {% endif %}
 
         {% endif %}
-        <div id="comments-container">
-            <div>Comments: </div>
-            {% for c in comments %}
-                <div>{{c.user.username}} commented: {{c.comment}}</div>
-            {% empty %}
-                <div>No Comments Yet</div>
-            {% endfor %}
+
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                    Comments
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                  <div id="comment-container" class="accordion-body">
+                    <!--<div>Comments: </div>-->
+                    {% for c in comments %}
+                        <div>{{c.user.username}} commented: {{c.comment}}</div>
+                    {% empty %}
+                        <div>No Comments Yet</div>
+                    {% endfor %}
+                </div>
+              </div>
+            </div>
         </div>
+
         {% if user.is_authenticated %}
             <form id="comment-form" action="{% url 'auctions:comment' auction.id %}" method="POST">
                 {% csrf_token %}
