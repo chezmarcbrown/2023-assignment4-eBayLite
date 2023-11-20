@@ -17,7 +17,6 @@
     function watchlist_button_click(listingId)
         {
             var btn = document.getElementById(listingId);
-            console.log(listingId);
             fetch('../watchlist_add_or_remove/' + btn.dataset.listingId);
             
             // Add listing to watchlist
@@ -35,6 +34,43 @@
                 btn.className = "add";
             }
         }
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var postBtn = document.getElementById('post');
+        postBtn.addEventListener("click", function() {
+            add_comment('{{listing.id}}');
+        });
+    });
+
+    function add_comment(listingId) {
+        var commentBoxValue = document.getElementById("comment_input").value;
+
+        if (!document.getElementById("comment_row").innerHTML.includes(commentBoxValue)) {
+            var commentDiv = document.createElement("div");
+            var commenterName = '{{ user.username }}';
+            commentDiv.className = "col-2 card-gray p-25";
+            
+
+            var rowDiv = document.createElement("div");
+            rowDiv.className = "row center";
+
+            var text = document.createTextNode(commenterName + ' commented: ' + commentBoxValue);
+            commentDiv.appendChild(text);
+            rowDiv.appendChild(commentDiv);
+            document.getElementById("comment_list").appendChild(rowDiv);
+
+            save_new_comment(listingId, newComment);
+
+            document.getElementById("comment_input").value = null;
+        }
+    }
+    
+    function save_new_comment(listingId, newComment) {
+        fetch('../add_comment/' + listingId + "/" + newComment);
+    }    
+
 </script>
 
 <div class="row">
@@ -110,24 +146,29 @@
     <div class="col-2">
         <h4>Comments</h4>
         <div class="card-gray">
-            {% for comment in comments %}
-            <div class="row center">
-                <div class="col-2 card-gray p-25">
-                    {{comment.author}} commented: {{comment.comment}}
-                </div>
-                <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
-                    <div>
-                        {% if user.is_superuser %}
-                        <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
-                        {% endif %}
+            <div id="comment_list">
+                {% for comment in comments %}
+                <div id="comment_row" class="row center">
+                    <div class="col-2 card-gray p-25">
+                        {{comment.author}} commented: {{comment.comment}}
                     </div>
-                </form>
+                    {% if user.is_superuser %}
+                    <form class="vertical-center" action="{% url 'remove_comment' comment.id %}" method="GET">
+                        <div>
+                            <input name="remove_comment" class="button-delete" type="submit" value="Remove Comment"/>
+                        </div>
+                    </form>
+                    {% endif %}
+                </div>
+                {% endfor %}
+
+                <div id="comment_details"></div>     
             </div>
-            {% endfor %}
-            <form id="listing_comments" action="{% url 'listing' listing.id %}" method="POST">{% csrf_token %}
+            <form id="listing_comments" onsubmit="add_comment('{{ listing.id }}'); return false;">
+                {% csrf_token %}
                 <div class="comment_input">
-                    <textarea name="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
-                    <input class="button" type="submit"/>
+                    <textarea id="comment_input" type="text" placeholder="Comment on this listing!"></textarea>
+                    <input class="button" id="post" type="submit" value="Post Comment"/>
                 </div>
             </form>
         </div>
@@ -152,4 +193,6 @@
         </div>
     </div>
 </div>
+
+
 {% endblock %}
