@@ -1,0 +1,14 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<h2>Your Wishlist</h2>
+    {% for page in wishlist %}
+        <article>
+            <div><a href="{% url 'auctions:auction' page.id %}">{{ page.title }}</div>
+            <div>Description: {{ page.description }}</div>
+            <div>Current Price: {{ page.price }}</div>
+            <div><img src="{{ page.image_url }}" width="200px"></div>
+            <a href="{% url 'auctions:removewishlist' page.id %}">Remove from Wishlist</a>
+        </article>
+    {% endfor %}
+{% endblock %}

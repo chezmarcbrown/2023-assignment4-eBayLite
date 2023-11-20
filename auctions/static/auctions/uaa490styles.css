@@ -15,3 +15,22 @@ body {
 .form-control {
   width: 50%;
 }
+
+a {
+  text-decoration: none;
+}
+
+.cat {
+  width: 15%
+}
+
+img {
+  width: 50px;
+}
+
+#webtitle  {
+  color: aliceblue;
+}
+.welcome {
+  color: white;
+}

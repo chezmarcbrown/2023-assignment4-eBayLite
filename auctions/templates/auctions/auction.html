@@ -1,0 +1,98 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+    <article>
+    {% if auction.closed == True %}
+        {% if user == bid.user %}
+            <h1>You Won!</h1>
+            <h2>Auction #{{auction.id}}</h2>
+            <div>Title: {{auction.title}} Won by {{bid.user.username}}</div>
+            <div>Description: {{ auction.description }}</div>
+            <div>Category: {{auction.category}}</div>    
+            <div><img src="{{ auction.image_url }}" width="200px" data-lightbox="image-1" data-title="My caption"></div>
+            <div>Price: {{auction.price}}$</div>
+                <div>Comments: </div>
+                {% for c in comments %}
+                    <div>{{c.user.username}} commented: {{c.comment}}</div>
+                {% empty %}
+                    <div>No Comments</div>
+                {% endfor %}
+        {% endif %}
+    {% else %}
+        <h2>Auction #{{auction.id}}</h2>
+        <div>Title: {{auction.title}}</div>
+        <div>Description: {{ auction.description }}</div>
+        <div>Category: {{auction.category}}</div>    
+        <div><img src="{{ auction.image_url }}" width="200px" data-lightbox="image-1" data-title="My caption"></div>
+        {% if bid.user == auction.user %}
+        <div>Current Price: {{auction.price}}$</div>
+        {% else %}
+        <div>Current Price: {{ auction.price }}$ from {{bid.user.username}}</div>
+        {% endif %}
+        {% if user.is_authenticated %}
+            <form action="{% url 'auctions:makebid' bid.id auction.id %}" method="POST">
+                {% csrf_token %}
+                <input type="float" min="{{ bid.bid }}" name="bid" placeholder="Make Your Bid">
+                <button type="submit">Bid</button>
+            </form>
+            <img></img>
+
+            
+
+            <a id="d" href="{% url 'auctions:addwishlist' auction.id %}" hidden>Add to watchlist</a><!--should make it where is only displays if its in the wishlist-->         
+            {% if user == auction.user %}<!--fix this-->
+                <a href="{% url 'auctions:closebid' auction.id %}">Close Bidding</a>
+            {% endif %}
+            <!--
+            <div id="watchlist-icon" data-listing-id="{{ auction.id }}" class="{% if auction_in_watchlist %} on {% else %} off {% endif %}">
+                {% if auction_in_watchlist %}
+                    <i class="fas fa-heart"></i>Watchlisted
+                {% else %} 
+                    <i class="far fa-heart"></i>Not Watchlisted
+                {% endif %}
+            </div>
+            -->
+            {% if auction in user.wishlist.all %}<!--doesnt work-->
+                <div id="watchlist-image" dataset="{{ auction.id }}">
+                    <a dataset="{{ auction.id }}" id="watchlist" href="{% url 'auctions:removewishlist' auction.id %}"><img id="foo" src='https://cdn.icon-icons.com/icons2/1369/PNG/512/-favorite_90527.png'></a>
+                </div>
+            {% else %}
+                <div id="watchlist-image" dataset="{{ auction.id }}">
+                    <a dataset="{{ auction.id }}" id="wishlist" href="{% url 'auctions:addwishlist' auction.id %}"><img id="foo" src='https://cdn-icons-png.flaticon.com/512/73/73814.png'></a>
+                </div>
+            {% endif %}
+
+        {% endif %}
+
+        <div class="accordion" id="accordionPanelsStayOpenExample">
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="panelsStayOpen-headingTwo">
+                  <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false" aria-controls="panelsStayOpen-collapseTwo">
+                    Comments
+                  </button>
+                </h2>
+                <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse" aria-labelledby="panelsStayOpen-headingTwo">
+                  <div id="comment-container" class="accordion-body">
+                    <!--<div>Comments: </div>-->
+                    {% for c in comments %}
+                        <div>{{c.user.username}} commented: {{c.comment}}</div>
+                    {% empty %}
+                        <div>No Comments Yet</div>
+                    {% endfor %}
+                </div>
+              </div>
+            </div>
+        </div>
+
+        {% if user.is_authenticated %}
+            <form id="comment-form" action="{% url 'auctions:comment' auction.id %}" method="POST">
+                {% csrf_token %}
+                {{ commentform.as_p }}
+                <!--<input type="text" id="comment" autofocus placeholder="Comment">-->
+                <br>
+                <input class="btn btn-primary" type="submit" value="Comment">
+            </form>
+        {% endif %}
+    {% endif %}
+    </article>
+{% endblock %}
