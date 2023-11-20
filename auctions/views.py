@@ -201,8 +201,8 @@ def create_listing(request):
         "auctions/create_listing.html",
         {"auction_form": auction_form, "auctions": auctions},
     )
-    
-    
+
+
 @login_required
 def watchlist(request, auction_id):
     if request.method == "POST":
@@ -210,9 +210,9 @@ def watchlist(request, auction_id):
             auction = AuctionListing.objects.get(id=auction_id)
         except AuctionListing.DoesNotExist:
             return JsonResponse({"error": "Auction does not exist"}, status=400)
-       
+
         watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
-        if not created:  
+        if not created:
             watchlist_item.delete()
             added = False
         else:
@@ -242,14 +242,14 @@ def remove_from_watchlist(request, auction_id):
         return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
-    
+
 
 def category_listings(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     listings = AuctionListing.objects.filter(category=category, active=True)
-    
-    watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('auction_listing_id', flat=True)
-    
+
+    watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
+
     return render(request, "auctions/category_listings.html", {
         "category": category,
         "listings": listings,
