@@ -1,0 +1,14 @@
+{% extends "auctions/layout.html" %}
+{% block main %}
+    <h1>Categories</h1>
+   
+        {% for c in categories %}
+            <div>
+                <a class="btn btn-primary" href="{% url 'auctions:category_listings' c.id %}">{{ c.name }}</a>
+                {% if c.image %}
+                    <img src="{{ c.image.url }}" alt="{{ c.name }}" height="50">
+                {% endif %}
+            </div>
+        {% endfor %}
+
+{% endblock %}

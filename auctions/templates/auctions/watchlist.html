@@ -1,0 +1,66 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<div class="container mt-4">
+    <h1 class="text-center">Watchlist</h1> <!-- Centered heading -->
+    <input type="hidden" id="csrfToken" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+    <div class="d-flex justify-content-center"> <!-- Flex container for centering -->
+        <div class="w-100" style="max-width: 720px;"> <!-- Set a max width for the inner content -->
+            {% for i in watchlist_items %}
+                <div id="watchlist-item-{{ i.auction_listing.id }}" class="card mb-3">
+                    <div class="row no-gutters">
+                        {% if i.auction_listing.image %}
+                            <div class="col-md-4">
+                                <img src="{{ i.auction_listing.image.url }}" class="card-img" alt="{{ i.auction_listing.title }}">
+                            </div>
+                        {% endif %}
+                        <div class="col-md-8">
+                            <div class="card-body">
+                                <a href="{% url 'auctions:category_listings' i.auction_listing.category.id %}">
+                                    {{ i.auction_listing.category.name }}
+                                </a>
+                                <h5 class="card-title">{{ i.auction_listing.title }}</h5>
+                                {% if i.auction_listing.image_url %}
+                                    <img src="{{ i.auction_listing.image_url }}" class="card-img-top" alt="{{ i.auction_listing.title }}">
+                                {% endif %}
+                                <p class="card-text">{{ i.auction_listing.description }}</p>
+                                <a class="btn btn-success" href="{% url 'auctions:listing' i.auction_listing.id %}">Bid!</a>
+                                <p class="card-text">{{ i.auction_listing.active|yesno:"Active,Not Active" }}</p>
+                                <i class="fa-solid fa-heart watchlist-remove-icon red-heart" data-listing-id="{{ i.auction_listing.id }}"></i>
+                                <span class="remove-text">Remove</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p class="text-center">No items in your watchlist.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $('.watchlist-remove-icon').click(function () {
+                var auctionId = $(this).data('listing-id');
+                var icon = $(this); // Cache the icon element for use in the callback
+
+                // AJAX call to remove item from watchlist
+                $.ajax({
+                    url: '/remove_from_watchlist/' + auctionId + '/',
+                    method: 'POST',
+                    data: {
+                        csrfmiddlewaretoken: $('#csrfToken').val()
+                    },
+                    success: function (response) {
+                        // Remove the section containing the watchlist item
+                        $('#watchlist-item-' + auctionId).remove();
+                    },
+                    error: function () {
+                        console.error('Error removing item from watchlist.');
+                    }
+                });
+            });
+        });
+    </script>
+</div>  
+{% endblock %}
