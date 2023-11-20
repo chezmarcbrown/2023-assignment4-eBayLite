@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const commentForm = document.getElementById('comment-form');
     console.log(commentForm)
-    const commentsContainer = document.getElementById('comments-container');
+    const commentsContainer = document.getElementById('comment-container');
     console.log(commentsContainer)
 
     if (commentForm) {
