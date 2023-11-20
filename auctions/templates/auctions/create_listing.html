@@ -1,20 +1,23 @@
-{% extends "auctions/layout.html" %} {% block main %}
-<header>
-  {% for m in messages %}
-  <h2 class="{{m.tags}}">{{m}}</h2>
-  {% endfor %}
-  <h2>Add a new Auction</h2>
-  <form method="post" enctype="multipart/form-data">
-    {% csrf_token %} {{auction_form}}
-    <div>
-      <button type="submit">Submit</button>
-    </div>
-  </form>
-</header>
-{% if user.is_authenticated %}
-    <a href="{% url 'auctions:watchlist' %}">Watchlist</a>
-    <a href="{% url 'auctions:create_listing' %}">Create Listing</a>
-{% endif %}
-
-
+{% extends "auctions/layout.html" %}
+{% block main %}
+{% load crispy_forms_tags %}
+<div class="container">
+    <h2>Add a new Auction</h2>
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}}>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ auction_form|crispy }}
+        </div>
+        <div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </form>
+</div>
 {% endblock %}

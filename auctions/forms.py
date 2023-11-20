@@ -17,7 +17,7 @@ class AuctionForm(forms.ModelForm):
     category = forms.ModelChoiceField(queryset=Category.objects.all())
     class Meta:
         model = AuctionListing
-        fields = ('title', 'description', 'starting_bid', 'image_url', 'category', 'active')
+        fields = ('title', 'description', 'starting_bid', 'image_url', 'category')
         
 class BidForm(forms.ModelForm):
     class Meta:

@@ -12,18 +12,24 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect
+from django.forms import model_to_dict
+from django.http import Http404, HttpResponse, HttpResponseForbidden, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from .models import User, AuctionListing, Category, Bid, Comment
+from django.db.models import F
+from .models import User, AuctionListing, Category, Bid, Comment, Watchlist
 from .forms import AuctionForm, BidForm, CommentForm
 from django.contrib import messages
 
 
+
 def index(request):
-    # show all active listings
-    auctions = AuctionListing.objects.all()
-    return render(request, "auctions/index.html", {"auctions": auctions})
+    auctions = AuctionListing.objects.filter(active=True)
+    watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
+    return render(request, "auctions/index.html", {
+        "auctions": auctions,
+        "watchlist_ids": watchlist_ids
+    })
 
 
 def login_view(request):
@@ -80,14 +86,16 @@ def register(request):
     else:
         return render(request, "auctions/register.html")
 
+
 @login_required
 def listing(request, listing_id):
     listing = get_object_or_404(AuctionListing, id=listing_id)
     bid_form = BidForm()
-    bids = Bid.objects.all()
+    bids = Bid.objects.filter(listing=listing_id).order_by("-amount").select_related('bidder')
     comment_form = CommentForm()
-    comments = Comment.objects.all()
+    comments = Comment.objects.filter(listing=listing_id).order_by("-date_created").select_related('commenter')
     is_creator = request.user.is_authenticated and request.user == listing.creator
+    watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
 
     return render(
         request,
@@ -99,8 +107,21 @@ def listing(request, listing_id):
             "comments": comments,
             "comment_form": comment_form,
             "is_creator": is_creator,
+            "watchlist_ids": watchlist_ids
         },
     )
+
+
+def get_comments_data(listing_id):
+    comment_queryset = Comment.objects.filter(listing=listing_id).order_by("-date_created")
+    return [model_to_dict(comment) for comment in comment_queryset]
+
+
+def getComments(request, listing_id):
+    response = {
+        'comments': get_comments_data(listing_id)
+    }
+    return JsonResponse(response)
 
 
 def comment(request, listing_id):
@@ -109,34 +130,64 @@ def comment(request, listing_id):
         if comment_form.is_valid():
             content = comment_form.cleaned_data["content"]
             listing = get_object_or_404(AuctionListing, id=listing_id)
-            comment = Comment(content=content, listing=listing)
+            comment = Comment(commenter=request.user, content=content, listing=listing)
             comment.save()
-            return redirect("auctions:listing", listing_id=listing.id)
+            return JsonResponse({'status':'success'})
 
+
+def get_bids_data(listing_id):
+    bid_queryset = Bid.objects.filter(listing=listing_id).order_by("-amount")
+    return [model_to_dict(bid) for bid in bid_queryset]
+
+
+def getBids(request, listing_id):
+    response = {
+        'bids': get_bids_data(listing_id)
+    }
+    return JsonResponse(response)
 
 def bid(request, listing_id):
-    if request.method == "POST":
-        bid_form = BidForm(request.POST)
-        if bid_form.is_valid():
-            amount = bid_form.cleaned_data["amount"]
-            listing = get_object_or_404(AuctionListing, id=listing_id)
-            if amount > listing.starting_bid:
-                bid = Bid(amount=amount, listing=listing)
-                bid.save()
-                return redirect("auctions:listing", listing_id=listing.id)
-            else:
-                messages.error(request, "Bid must be greater than current bid")
-                return redirect("auctions:listing", listing_id=listing.id)
+    if request.method != "POST":
+        return JsonResponse({'status':'failed'})
+
+    bid_form = BidForm(request.POST)
+    if not bid_form.is_valid():
+        return JsonResponse({'status':'failed'})
+
+    listing = get_object_or_404(AuctionListing, id=listing_id)
+    bid_amount = bid_form.cleaned_data["amount"]
+
+    if bid_amount <= listing.starting_bid:
+        messages.error(request, "Bid must be greater than starting bid")
+        return JsonResponse({'status':'failed'})
+
+    highest_bid = listing.bids.order_by('-amount').first()
+    if highest_bid and bid_amount <= highest_bid.amount:
+        messages.error(request, "Bid must be greater than current bid")
+        return JsonResponse({'status':'failed'})
+
+    accepted_bid = Bid(bidder=request.user, amount=bid_amount, listing=listing)
+    accepted_bid.save()
+    return JsonResponse({'status':'success'})
+
 
 @login_required
 def create_listing(request):
     if request.method == "POST":
         auction_form = AuctionForm(request.POST, request.FILES)
         if auction_form.is_valid():
-            auction_form.save()
+            auction = AuctionListing(
+                creator=request.user,
+                title=auction_form.cleaned_data["title"],
+                description=auction_form.cleaned_data["description"],
+                starting_bid=auction_form.cleaned_data["starting_bid"],
+                image_url=auction_form.cleaned_data["image_url"],
+                category=auction_form.cleaned_data["category"],
+            )
+            auction.save()
             messages.success(
                 request,
-                (f'"{ auction_form.cleaned_data["title"] }" was successfully added!'),
+                (f'"{auction.title}" was successfully added!'),
             )
             return redirect("auctions:index")
         else:
@@ -150,48 +201,65 @@ def create_listing(request):
         "auctions/create_listing.html",
         {"auction_form": auction_form, "auctions": auctions},
     )
-
-
+    
+    
+@login_required
 def watchlist(request, auction_id):
-    if not request.user.is_authenticated:
-        return redirect("auctions:login")
-    try:
-        auction = AuctionListing.objects.get(id=auction_id)
-    except AuctionListing.DoesNotExist:
-        raise Http404("Auction does not exist")
-    # adds to users watchlist
-    request.user.watchlist.add(auction)
-    watchlist_items = request.user.watchlist.all()
-    return render(
-        request, "auctions/watchlist.html", {"watchlist_items": watchlist_items}
-    )
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
+       
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        if not created:  
+            watchlist_item.delete()
+            added = False
+        else:
+            added = True
+
+        return JsonResponse({"success": "Watchlist updated", "added": added}, status=200)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
 
 
 @login_required
 def watchlist_view(request):
-    watchlist_items = request.user.watchlist.all()
+    watchlist_items = Watchlist.objects.filter(user=request.user)
     return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
 
-
+@login_required
 def remove_from_watchlist(request, auction_id):
-    auction = AuctionListing.objects.get(id=auction_id)
-    # removes from users watchlist
-    request.user.watchlist.remove(auction)
-    watchlist_items = request.user.watchlist.all()
-    return render(
-        request, "auctions/watchlist.html", {"watchlist_items": watchlist_items}
-    )
+    watchlist_items = Watchlist.objects.filter(user=request.user)
+    if request.method == "POST":
+        try:
+            auction = AuctionListing.objects.get(id=auction_id)
+        except AuctionListing.DoesNotExist:
+            return JsonResponse({"error": "Auction does not exist"}, status=400)
+        watchlist_item, created = Watchlist.objects.get_or_create(user=request.user, auction_listing=auction)
+        watchlist_item.delete()
+        return render(request, "auctions/watchlist.html", {"watchlist_items": watchlist_items})
 
+    return JsonResponse({"error": "Invalid request"}, status=400)
+    
 
 def category_listings(request, category_id):
-    category = Category.objects.get(id=category_id)
-    listings = AuctionListing.objects.filter(category=category, active=True)  
-    return render(request, "auctions/category_listings.html", {"category": category, "listings": listings})
+    category = get_object_or_404(Category, id=category_id)
+    listings = AuctionListing.objects.filter(category=category, active=True)
+    
+    watchlist_ids = Watchlist.objects.filter(user=request.user).values_list('auction_listing_id', flat=True)
+    
+    return render(request, "auctions/category_listings.html", {
+        "category": category,
+        "listings": listings,
+        "watchlist_ids": watchlist_ids
+    })
 
 def category(request):
     categories = Category.objects.all()
     return render(request, "auctions/categories.html", {"categories": categories})
+
 
 @login_required
 def close_listing(request, listing_id):
@@ -201,7 +269,6 @@ def close_listing(request, listing_id):
         return HttpResponseForbidden("You are not authorized to close this listing.")
 
     if request.method == "POST":
-        listing.active = False 
+        listing.active = False
         listing.save()
         return HttpResponseRedirect(reverse("auctions:listing", args=(listing_id,)))
-
