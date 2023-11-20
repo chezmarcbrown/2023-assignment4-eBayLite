@@ -6,6 +6,9 @@ from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Max
 
+#import json
+#from django.http import JsonResponse
+
 from .models import User, category_list, Listing, Watchlist, Comment, Bid
 
 
@@ -133,6 +136,20 @@ def create(request):
             "categories": category_list
         })
     
+
+
+def add_comment(request, listing_id, new_comment):
+    item = Listing.objects.get(id=listing_id)
+    comment = Comment.objects.filter(item=item)
+
+    if new_comment:
+        comment = Comment.objects.create(author=request.user, item=item, comment=new_comment)
+        comment.save()
+
+    return HttpResponse(200)  
+
+
+
 def listing(request, listing_id):
     item = Listing.objects.get(id = listing_id)
     comments = Comment.objects.filter(item = item)
@@ -164,9 +181,7 @@ def listing(request, listing_id):
     
     if request.method == "POST":
         if request.POST.get('comment_input'):
-            comment = Comment.objects.create(author=request.user, item=item, comment=request.POST.get('comment_input'))
-            comment.save()
-            return redirect(listing, listing_id)
+            return add_comment(request)
         if request.POST.get('place_bid'):
             item.current_bid = request.POST.get('place_bid')
             bid = Bid.objects.create(author=request.user, item=item, bid=request.POST.get('place_bid'))
