@@ -138,15 +138,12 @@ def create(request):
     
 
 
-def add_comment(request, listing_id):
+def add_comment(request, listing_id, new_comment):
     item = Listing.objects.get(id=listing_id)
-    comment, created = Comment.objects.get_or_create(author=request.user)
-    comment.save()
+    comment = Comment.objects.filter(item=item)
 
-    comment_text = request.POST.get('comment_input')
-
-    if comment_text:
-        comment = Comment.objects.create(author=request.user, item=item, comment=comment_text)
+    if new_comment:
+        comment = Comment.objects.create(author=request.user, item=item, comment=new_comment)
         comment.save()
 
     return HttpResponse(200)  

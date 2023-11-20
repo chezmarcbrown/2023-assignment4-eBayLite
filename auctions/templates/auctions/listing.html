@@ -61,14 +61,14 @@
             rowDiv.appendChild(commentDiv);
             document.getElementById("comment_list").appendChild(rowDiv);
 
-            save_new_comment(commentBoxValue, commenterName, listingId);
+            save_new_comment(listingId, newComment);
 
             document.getElementById("comment_input").value = null;
         }
     }
     
-    function save_new_comment(comment, commenter, listingId) {
-        fetch('../add_comment/' + listingId);
+    function save_new_comment(listingId, newComment) {
+        fetch('../add_comment/' + listingId + "/" + newComment);
     }    
 
 </script>
