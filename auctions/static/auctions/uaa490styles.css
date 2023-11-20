@@ -15,3 +15,310 @@ body {
 .form-control {
   width: 50%;
 }
+
+.row {
+  display: flex;
+}
+
+.border-bottom {
+  align-self: center;
+  border-bottom: 2px solid #898EA4;
+  border-radius: 5px;
+  margin: 0px;
+}
+
+.center {
+  justify-content: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-vertical-center {
+  vertical-align: middle;
+  line-height: 200px;
+}
+
+.col {
+  width: 100%;
+}
+
+.col-2 {
+  width: 50%;
+}
+
+.col-3 {
+  width: 33%;
+}
+
+.card-gray {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(39, 39, 39);
+  border: 3px solid #898EA4;
+  border-radius: 10px;
+  align-content: space-evenly;
+
+  .row {
+    padding: 25px;
+  }
+
+  label {
+    color: rgba(0, 195, 255, 0.753);
+  }
+}
+
+.card-blue {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  color: rgba(0, 195, 255, 0.753);
+  background-color: rgb(39, 39, 39);
+  border: 3px solid rgba(0, 195, 255, 0.753);
+  border-radius: 10px;
+  align-content: space-evenly;
+
+  label {
+    color: rgba(0, 195, 255, 0.753);
+  }
+}
+
+.interactive-card {
+  display: flex;
+  width: 50% !important;
+  height: 200px;
+  margin-bottom: 40px;
+  background-color: rgb(39, 39, 39) !important;
+  border: 3px solid rgba(0, 195, 255, 0.753) !important;
+  color: rgba(0, 195, 255, 0.753) !important;
+  border-radius: 10px;
+
+  &:hover {
+    background-color: rgb(131, 131, 131);
+    cursor: pointer;
+  }
+}
+
+input {
+  
+  &.button {
+    border: 3px solid rgba(0, 195, 255, 0.753) !important;
+    background-color: rgba(0, 195, 255, 0.753) !important;
+    color: aliceblue !important;    
+  }
+  
+  &.button-delete {
+    border: 3px solid rgba(255, 8, 0, 0.753) !important;
+    background-color: rgba(255, 8, 0, 0.753) !important;
+    color: aliceblue !important;    
+    float: right;
+  }
+  
+  &.button-close {
+    border: 3px solid rgba(0, 255, 13, 0.753) !important;
+    background-color: rgba(0, 255, 13, 0.753) !important;
+    color: aliceblue !important;    
+    float: right;
+  }
+  
+  &.category {
+    transition: all 500ms;
+    justify-content: center;
+
+    &:hover {
+      font-size: 40px;
+    }
+  }
+}
+
+.nav-button {
+  margin: 0 0.5rem 1rem 0.5rem;
+  border: 1px solid #898EA4 !important;
+  border-radius: 5px;
+  color: #dcdcdc !important;
+  background-color: transparent !important;
+  display: inline-block;
+  padding: 0.1rem 1rem;
+  text-decoration: none;
+
+  &:hover {
+  color: rgba(0, 195, 255, 0.753) !important;
+  border-color: rgba(0, 195, 255, 0.753) !important;
+  }
+}
+
+button {
+  background-color: rgba(0, 195, 255, 0.753) !important;
+  border-color: rgba(0, 195, 255, 0.753) !important;
+
+  > a {
+    color: aliceblue !important;
+    text-decoration: none !important;
+  }
+}
+
+.inline-flex {
+  display: inline-flex !important;
+}
+
+.float-right {
+  float: right;
+}
+
+.p-25 {
+  padding: 25px;
+}
+
+.mb-25 {
+  margin-bottom: 25px;
+}
+
+.horizontal-space-evenly {
+  & > *:not(:last-of-type) {
+    margin-right: 50px;
+  }
+}
+
+.vertical-space-evenly {
+  & > *:not(form) {
+    margin-top: 25px;
+    margin-bottom: 25px;
+  }
+}
+
+.vertical-center {
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.dollar-sign {
+  float: left;
+  font-size: 30px;
+}
+
+.place_bid {
+  width: 100%;
+
+  > span {
+    width: 10%;
+  }
+  > input {
+    border: 1px solid rgba(0, 195, 255, 0.753) !important;
+  }
+  > #place_bid_field {
+    float: left;
+    width: 40%;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+  > #place_bid_button {
+    width: 50%;
+    float: left;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+  }
+}
+
+.mt-50 {
+  margin-top: 50px;
+}
+
+.p-25 {
+  padding: 25px;
+}
+
+h4 {
+  margin-bottom: 0px;
+}
+
+#listing_comments {
+  display: block;
+
+  >.comment_input {
+    width: 90% !important;
+    margin: auto;
+    
+    >input {
+      display: block !important;
+    }
+    
+    >textarea {
+      margin-top: 50px;
+      margin-left: auto;
+      margin-right: auto;
+      width: 100%;
+      height: 150px;
+      resize: none;
+    }
+  }
+}
+
+.flex {
+  display: flex !important;
+}
+
+a {
+  color: rgba(0, 195, 255, 0.753) !important;
+  text-decoration: none;
+}
+
+.close_listing {
+  width: 100%;
+}
+
+.float-right {
+  float: right;
+}
+
+#watchlist_button {
+  >img {
+    width: 40px;
+    height: 40px;
+    margin-bottom: -5px;
+  }
+
+  >.add {
+    &:hover {
+      background: url('../icons/heart-fill.png') no-repeat center center / contain;
+    }
+  }
+
+  >.remove {
+    &:hover {
+      background: url('../icons/heart-line.png') no-repeat center center / contain;
+    }
+  }
+}
+
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+
+.panel {
+  width: 100%;
+  padding: 0;
+  background-color: none;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.category-box {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,13 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<h2 class="center text-center">Categories</h2>
+
+<form action="{% url 'index' %}" method="GET">
+    {% for category in categories %}
+    <div class="col-2 category-box">
+        <input class="interactive-card category center" type="submit" name="category" value="{{category}}"/>
+    </div>
+    {% endfor %}
+</form>
+{% endblock %}
