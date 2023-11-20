@@ -15,6 +15,7 @@
                         {% endif %}
                         <div class="card-body">
                             <h5 class="card-title">{{ listing.title }}</h5>
+                            <a class="btn btn-success" href="{% url 'auctions:listing' listing.id %}">Bid!</a>
                             <p class="card-text">{{ listing.description }}</p>
                             <p class="card-text">Starting Bid: ${{ listing.starting_bid }}</p>
                             {% if listing.id in watchlist_ids %}

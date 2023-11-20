@@ -16,14 +16,15 @@
                         {% endif %}
                         <div class="col-md-8">
                             <div class="card-body">
+                                <a href="{% url 'auctions:category_listings' i.auction_listing.category.id %}">
+                                    {{ i.auction_listing.category.name }}
+                                </a>
                                 <h5 class="card-title">{{ i.auction_listing.title }}</h5>
                                 {% if i.auction_listing.image_url %}
                                     <img src="{{ i.auction_listing.image_url }}" class="card-img-top" alt="{{ i.auction_listing.title }}">
                                 {% endif %}
                                 <p class="card-text">{{ i.auction_listing.description }}</p>
-                                <a href="{% url 'auctions:category_listings' i.auction_listing.category.id %}">
-                                    {{ i.auction_listing.category.name }}
-                                </a>
+                                <a class="btn btn-success" href="{% url 'auctions:listing' i.auction_listing.id %}">Bid!</a>
                                 <p class="card-text">{{ i.auction_listing.active|yesno:"Active,Not Active" }}</p>
                                 <i class="fa-solid fa-heart watchlist-remove-icon red-heart" data-listing-id="{{ i.auction_listing.id }}"></i>
                                 <span class="remove-text">Remove</span>

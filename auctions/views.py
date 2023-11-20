@@ -91,9 +91,9 @@ def register(request):
 def listing(request, listing_id):
     listing = get_object_or_404(AuctionListing, id=listing_id)
     bid_form = BidForm()
-    bids = Bid.objects.filter(listing=listing_id).order_by("-amount")
+    bids = Bid.objects.filter(listing=listing_id).order_by("-amount").select_related('bidder')
     comment_form = CommentForm()
-    comments = get_comments_data(listing_id)
+    comments = Comment.objects.filter(listing=listing_id).order_by("-date_created").select_related('commenter')
     is_creator = request.user.is_authenticated and request.user == listing.creator
     watchlist_ids = request.user.watchlist.values_list('auction_listing_id', flat=True) if request.user.is_authenticated else []
 

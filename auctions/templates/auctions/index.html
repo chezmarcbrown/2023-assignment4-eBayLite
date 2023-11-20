@@ -28,7 +28,7 @@
                     <div id="collapse{{ a.id }}" class="collapse" aria-labelledby="heading{{ a.id }}"
                          data-parent="#accordionListing">
                         <div class="card-body">
-                            <a href="{% url 'auctions:listing' a.id %}">Details</a>
+                            <a class="btn btn-success" href="{% url 'auctions:listing' a.id %}">Bid!</a>
                             <p>Description: {{ a.description }}</p>
                             <p>Starting Bid ${{ a.starting_bid }}</p>
                             {% if a.image_url %}
