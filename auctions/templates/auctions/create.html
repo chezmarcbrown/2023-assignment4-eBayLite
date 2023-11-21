@@ -1,0 +1,63 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+<h2>Create New Listing</h2>
+
+<script src="https://s.electerious.com/basicLightbox/dist/basicLightbox.min.js"></script>
+
+<div>
+    <div id="image" hidden>
+        <img id="exampleImage" width="600" height="300" src="auctions/templates/auctions/example.jpg">
+    </div>
+    <button class="html">Example</button>
+    <br>
+</div>
+
+<script>
+    document.querySelector('button.html').addEventListener('click', function () {
+        const imageSource = document.getElementById('exampleImage').src;
+        const imageInstance = basicLightbox.create(`
+            <div>
+                <img src="${imageSource}" width="800" height="500">
+                <button id="closeButton">Close</button>
+            </div>
+        `);
+
+        imageInstance.show();
+
+        document.getElementById('closeButton').addEventListener('click', function () {
+            imageInstance.close();
+        });
+    });
+</script>
+
+
+<form action="{% url 'create' %}" method="POST">
+    {% csrf_token %}
+    <div>
+        <label for="title">Title</label>
+        <input type="text" name="title" class="form-control" id="title" placeholder="Enter Title">
+    </div>
+    <div>
+        <label for="description">Description</label>
+        <input type="text" name="description" class="form-control" id="description" placeholder="Enter Description">
+    </div>    
+    <div>
+        <label for="imageurl">Image URL</label>
+        <input type="text" name="imageurl" class="form-control" id="imageurl" placeholder="Enter Image URL">
+    </div>
+    <div>
+        <label for="price">Price</label>
+        <input type="number" min="0" name="price" class="form-control" id="price" placeholder="Enter Price">
+    </div>
+    Select Category: 
+    <select name="category" id="category">
+        {% for item in categories %}
+        <option value="{{item}}">{{item}}</option>
+        {% endfor %}
+    </select>
+    <div>
+        <button type="submit">Create New Listing</button>
+    </div>
+</form>
+{% endblock %}

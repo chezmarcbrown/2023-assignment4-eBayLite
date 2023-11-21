@@ -1,0 +1,102 @@
+{% extends "auctions/layout.html" %}
+
+{% block extra_css %}
+<style>
+  .accordion-button {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 10px 20px;
+    border: none;
+    outline: none;
+    font-size: 15px;
+    transition: 0.4s;
+  }
+
+  .accordion-button:hover {
+    background-color: #ccc;
+  }
+
+  .panel {
+    padding: 0 18px;
+    display: none;
+    background-color: white;
+    overflow: hidden;
+  }
+</style>
+{% endblock %}
+
+{% block main %}
+<h1>
+  {% if message %}
+    {{ message }}
+  {% endif %}
+</h1>
+
+<div class="row">
+    {% if user.is_authenticated %}
+        {% if isOwner %}
+            <form action="{% url 'closeAuction' id=listing.id %}" method="POST">
+                {% csrf_token %}
+                <button type="submit">Close Auction</button>
+            </form>
+        {% endif %}
+    {% endif %}
+</div>
+
+<h2>{{ listing.title }}</h2>
+<img style="max-width: 20vw;" src="{{ listing.imageUrl }}" alt="{{ listing.title }}">
+<p>Description: {{ listing.description }}</p>
+<p>Owner: {{ listing.owner }}</p>
+<p>Category: {{ listing.category }}</p>
+<p>Price: ${{ listing.price.bid }}</p>
+
+<div>
+  <h2>Make bid</h2>
+  {% if user.is_authenticated %}
+    <form action="{% url 'addBid' id=listing.id %}" method="POST">
+      {% csrf_token %}
+      <input type="number" min="0" name="newBid" placeholder="New Bid">
+      <button type="submit">Submit</button>
+    </form>
+  {% endif %}
+</div>
+
+<p>{{ message }}</p>
+
+<div>
+    <button class="accordion-button" onclick="toggleComments()">Hide Comments</button>
+  {% if user.is_authenticated %}
+    <form id="commentForm" data-url="{% url 'addComment' id=listing.id %}" method="POST">
+      {% csrf_token %}
+      <input type="text" name="comment" placeholder="New Comment">
+      <button type="submit">Submit</button>
+    </form>
+  {% endif %}
+</div>
+
+<div class="panel" id="commentPanel">
+  <ul>
+    {% for comment in allComments %}
+    <li class="commentItem">
+      User {{ comment.author }} says:
+      <br />
+      {{ comment.message }}
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+
+<script>
+  function toggleComments() {
+    var panel = document.getElementById("commentPanel");
+    if (panel.style.display === "none") {
+      panel.style.display = "block";
+      document.querySelector('.accordion-button').innerText = "Hide Comments";
+    } else {
+      panel.style.display = "none";
+      document.querySelector('.accordion-button').innerText = "Show Comments";
+    }
+  }
+</script>
+{% endblock %}
