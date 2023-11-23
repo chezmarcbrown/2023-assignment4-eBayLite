@@ -114,10 +114,10 @@ def showCategory(request):
 def listings(request, id):
  listingData = Auction.objects.get(pk=id)
  isListingInWatchList = request.user in listingData.watchlist.all()
- comments = Comment.objects.filter(listing=listingData)
+ comments = Comment.objects.filter(auction=listingData)
  isSeller = request.user.username == listingData.seller.username
- return render(request, "auctions/listing.html", {
-        "listing": listingData,
+ return render(request, "auctions/listings.html", {
+        "auction": listingData,
         "isListingInWatchList" : isListingInWatchList,
         "comments": comments,
         "isSeller": isSeller
@@ -127,15 +127,15 @@ def addBid(request, id):
     newBid = request.POST['newBid']
     listingData = Auction.objects.get(pk=id)
     isListingInWatchList = request.user in listingData.watchlist.all()
-    comments = Comment.objects.filter(listing=listingData)
+    comments = Comment.objects.filter(auction=listingData)
     isSeller = request.user.username == listingData.seller.username
     if float(newBid) > float(listingData.price.bid):
         updateBid = Bid(user=request.user, bid=float(newBid))
         updateBid.save()
         listingData.price = updateBid
         listingData.save()
-        return render(request, "auctions/listing.html", {
-            "listing": listingData,
+        return render(request, "auctions/listings.html", {
+            "auction": listingData,
             "message": "Successful bid",
             "update": True,
             "isListingInWatchList" : isListingInWatchList,
@@ -143,7 +143,7 @@ def addBid(request, id):
             "isSeller": isSeller, 
         })
     else:
-        return render(request, "auctions/listing.html", {
+        return render(request, "auctions/listings.html", {
             "listing": listingData,
             "message": "Unsuccessful bid",
             "update": False,
@@ -164,22 +164,22 @@ def removeWatchList(request, id):
     listingData = Auction.objects.get(pk=id)
     currentUser = request.user
     listingData.watchlist.remove(currentUser)
-    return HttpResponseRedirect(reverse("listing", args=(id, )))
+    return HttpResponseRedirect(reverse("listings", args=(id, )))
 
 def addWatchList(request, id):
     listingData = Auction.objects.get(pk=id)
     currentUser = request.user
     listingData.watchlist.add(currentUser)
-    return HttpResponseRedirect(reverse("listing", args=(id, )))    
+    return HttpResponseRedirect(reverse("listings", args=(id, )))    
 
 def closeAuction(request, id):
     listingData = Auction.objects.get(pk=id)
-    listingData.isActive = False
+    listingData.close = False
     listingData.save()
     isListingInWatchList = request.user in listingData.watchlist.all()
-    comments = Comment.objects.filter(listing=listingData)
+    comments = Comment.objects.filter(auction=listingData)
     isSeller = request.user.username == listingData.seller.username
-    return render(request, "auctions/listing.html", {
+    return render(request, "auctions/listings.html", {
         "listing": listingData,
         "isListingInWatchList" : isListingInWatchList,
         "comments": comments,
@@ -210,8 +210,8 @@ def addComment(request, id):
     message = request.POST['comment']
     newComment = Comment(
         author=currentUser,
-        listing=listingData,
+        auction=listingData,
         message=message
     )
     newComment.save()
-    return HttpResponseRedirect(reverse("listing", args=(id, )))
+    return HttpResponseRedirect(reverse("listings", args=(id, )))

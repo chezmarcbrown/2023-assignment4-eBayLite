@@ -5,18 +5,18 @@
 <div class="row">
     {% if user.is_authenticated %}
         {% if isOwner %}
-            <form action="{% url 'closeAuction' id=listing.id %}" method="POST">
+            <form action="{% url 'closeAuction' id=auction.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit">Close Auction</button>
             </form>
         {% endif %}
         {% if isListingInWatchList %}
-            <form action="{% url 'removeWatchList' id=listing.id %}" method="POST">
+            <form action="{% url 'removeWatchList' id=auction.id %}" method="POST">
                 {% csrf_token %}
                 <button type="submit">Remove from Watchlist</button>
             </form>
         {% else %}
-        <form action="{% url 'addWatchList' id=listing.id %}" method="POST">
+        <form action="{% url 'addWatchList' id=auction.id %}" method="POST">
             {% csrf_token %}
             <button type="submit">Add to Watchlist</button>
         </form>
@@ -24,16 +24,16 @@
     {% endif %}
 </div>
 
-<h2>{{ listing.title }}</h2>
-<img style="max-width: 20vw;" src="{{listing.imageUrl}}" alt="{{listing.title}}">
-<p>Description: {{listing.description}}</p>
-<p>Owner: {{listing.seller}}</p>
-<p>Category: {{listing.category}}</p>
-<p>Price: ${{listing.price.bid}}</p>
+<h2>{{ auction.title }}</h2>
+<img style="max-width: 20vw;" src="{{auction.imageUrl}}" alt="{{auction.title}}">
+<p>Description: {{auction.description}}</p>
+<p>Owner: {{auction.seller}}</p>
+<p>Category: {{auction.category}}</p>
+<p>Price: ${{auction.price.bid}}</p>
 <div>
     <h2>Make your bid</h2>
     {% if user.is_authenticated %}
-        <form action="{% url 'addBid' id=listing.id %}" method="POST">
+        <form action="{% url 'addBid' id=auction.id %}" method="POST">
             {% csrf_token %}
             <input type="number" min="0" name="newBid" placeholder="New Bid">
             <button type="submit">Bid!</button>
@@ -44,10 +44,10 @@
 <div>
     <h2>Comments</h2>
     {% if user.is_authenticated %}
-        <form action="{% url 'addComment' id=listing.id %}" method="POST">
+        <form action="{% url 'addComment' id=auction.id %}" method="POST">
             {% csrf_token %}
             <input type="text" name="comment" placeholder="New Comment">
-            <button type="submit">Submit</button>
+            <button type="submit">Say it!</button>
         </form>
     {% endif %}
 </div>
