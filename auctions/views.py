@@ -189,18 +189,19 @@ def closeAuction(request, id):
     })
 
 def categories(request):
-    categories = Category.objects.values_list('title', flat=True).distinct()
-    categories = list(categories)
+    # categories = Category.objects.values_list('title', flat=True).distinct()
+    categories = Category.objects.all()
+    #categories = list(categories)
 
     return render(request, "auctions/categories.html", {
         "categories": categories
     })
 
-def categoryList(request, category):
-    listings = Auction.objects.filter(category=category)
+def categoryList(request, id):
+    listings = Auction.objects.filter(id=id)
 
     return render(request, "auctions/categoryList.html", {
-        "category": category,
+        "category": Category.objects.get(pk=id),
         "listings": listings
     })
 
