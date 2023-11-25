@@ -129,10 +129,10 @@ def addBid(request, id):
     isListingInWatchList = request.user in listingData.watchlist.all()
     comments = Comment.objects.filter(auction=listingData)
     isSeller = request.user.username == listingData.seller.username
-    if float(newBid) > float(listingData.price.bid):
+    if float(newBid) > float(listingData.price):
         updateBid = Bid(user=request.user, bid=float(newBid))
         updateBid.save()
-        listingData.price = updateBid
+        listingData.price = float(newBid)
         listingData.save()
         return render(request, "auctions/listings.html", {
             "auction": listingData,
@@ -144,7 +144,7 @@ def addBid(request, id):
         })
     else:
         return render(request, "auctions/listings.html", {
-            "listing": listingData,
+            "auction": listingData,
             "message": "Unsuccessful bid",
             "update": False,
             "isListingInWatchList" : isListingInWatchList,

@@ -16,6 +16,7 @@ class Auction(models.Model):
     title = models.CharField(max_length = 60)
     description = models.CharField(max_length = 480)
     price = models.DecimalField(max_digits = 9, decimal_places = 2, default = 0.00, validators = [MinValueValidator(0)])
+    #price = models.ForeignKey('Bid', on_delete=models.CASCADE)
     imageUrl = models.CharField(max_length = 1000, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="category", blank=True, null=True)
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name="auction_seller")
