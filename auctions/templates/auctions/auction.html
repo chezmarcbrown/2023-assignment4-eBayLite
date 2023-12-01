@@ -1,0 +1,29 @@
+{% extends "auctions/layout.html" %}
+
+{% block main %}
+    <h1>{{ auction.title}}</h1>
+
+    <h2>{{ auction.description }}</h2>
+    <h2> Current Bid : ${{ auction.current_bid }}</h2>
+    <h2><img src="{{ auction.image_url }}" width="150px"></h2>
+
+    <ul>
+        <li>
+            <a href="{% url 'auctions:watch' auction.id %}">watch (should be active only when the item is not being watched)</a>
+        </li>
+        <li>
+            <a href="{% url 'auctions:unwatch' auction.id %}">unwatch (should be active only when the item is being watched)</a>
+        </li>
+        <li>
+            <a href="{% url 'auctions:comment' auction.id %}">comment (not implemented)</a>
+        </li>
+        <li>
+            <a href="{% url 'auctions:updatebid' auction.id %}">updatebid (not implemented)</a>
+        </li>
+        <li>
+            <a href="{% url 'auctions:closebid' auction.id %}">close bid (not implemented)</a>
+        </li>
+    </ul>
+
+
+{% endblock %}

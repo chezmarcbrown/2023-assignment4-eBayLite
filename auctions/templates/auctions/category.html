@@ -2,7 +2,7 @@
 {% block main %}
 <h2>Active Listings in {{name}}</h2>
 {% for auction in auctions %}
-    <div><a href="{% url 'auctions:category' auction.id %}">{{ auction.title }}</div>
+    <div><a href="{% url 'auctions:auction' auction.id %}">{{ auction.title }}</a></div>
     <div>Description: {{ auction.description }}</div>
     <div>Current Price: ${{ auction.current_bid }}</div>
     <div><img src="{{ auction.image_url }}" width="200px"></div>

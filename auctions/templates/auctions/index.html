@@ -7,7 +7,7 @@
     {% if auction.closed == False %}
         <article>
             <div>
-                <a href="{% url 'auctions:auction' auction.id}">{{ auction.title}}
+                <a href="{% url 'auctions:auction' auction.id %}">{{ auction.title}}</a>
             </div>
             <div>{{ auction.description }}</div>
             <div> Current Bid : ${{ auction.current_bid }}</div>

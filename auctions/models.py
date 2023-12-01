@@ -18,7 +18,7 @@ class Auction(models.Model):
     current_bid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='auction_listing')
-    image_url = models.URLField(default='')
+    image_url = models.URLField(default='', blank=True, null=True)
     closed = models.BooleanField(default=False)
     winner = models.CharField(max_length=96, blank=True, null=True)
     

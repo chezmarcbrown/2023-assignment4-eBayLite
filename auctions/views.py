@@ -88,7 +88,8 @@ def create(request):
     })
 
 def auction(request, auction_id):
-    auction = AuctionForm.objects.get(pk=auction_id)
+    #WRONG: auction = AuctionForm.objects.get(pk=auction_id)
+    auction = get_object_or_404(Auction, id=auction_id)
     return render(request, "auctions/auction.html", {
         'auction' : auction,
         'user' : request.user,
@@ -119,35 +120,35 @@ def filterCategories(request, category):
         'name' : category
     })
 
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def watchlist(request):
     # URL gets super wierdly formatted here when having a login be required. I don't know how to fix it.
     return render(request, "auctions/watchlist.html", {
         'watchlist' : request.user.watchlist.all()
     })
 
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def watch(request, auction_id):
     # Untested Code
     request.user.watchlist.add(get_object_or_404(Auction, id=auction_id))
     request.user.save()
     return HttpResponseRedirect(reverse('auctions:watchlist'))
 
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def unwatch(request, auction_id):
     # Untested Code
     request.user.watchlist.remove(get_object_or_404(Auction, id=auction_id))
     request.user.save()
     return HttpResponseRedirect(reverse('auctions:watchlist'))
 
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def updatebid(request, auction_id):
     pass
     
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def closebid(request, auction_id):
     pass
 
-@login_required(login_url="auctions/login.html")
+@login_required(login_url="login")
 def comment(request, auction_id):
     pass
